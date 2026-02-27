@@ -2,76 +2,169 @@
 <html lang="et">
 <head>
     <meta charset="UTF-8">
-    <title>Mina olen digkangelane</title>
+    <title>Digikangelane - Web Designer & Developer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href ="" rel="styles.css">
-<link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<header>
-<nav>
-<div class="brand">Digikangelane</div>
-<ul class="menu">
-<li><a href="#about">Minust</a></li>
-<li><a href="#skills">Oskused</a></li>
-<li><a href="#works">Tööd</a></li>
-</ul>
-<a class="cta" href="#start">Alusta</a>
-</nav>
+<header class="navbar">
+    <nav class="nav-container">
+        <div class="logo">Digikangelane</div>
+        <ul class="nav-menu">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </nav>
 </header>
 
 <main>
-    <section class="hero">
-<div>
-<h1 class="title">Ehitan liideseid, mis tunduvad kiired</h1>
-<p class="subtitle">HTML, CSS ja napuotsaga julget maitset.</p>
-</div class="actions">
-<a class="cta" href="#works">Vaata töid</a>
-<a class="ghost" href="#contact">Võta ühendust</a>
-<div>
-</div>
+    <!-- HERO SECTION -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">I Build Beautiful <span class="gradient-text">Digital Experiences</span></h1>
+            <p class="hero-subtitle">HTML, CSS, JavaScript & a passion for clean code</p>
+            <div class="hero-buttons">
+                <a href="#work" class="btn btn-primary">View My Work</a>
+                <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-card">✨</div>
+        </div>
+    </section>
 
-<article class="card portfile" id="about"> 
-    <img class="avatar" src="" alt="Profiilipilt">
- <div>
-<span class="badge">#veebilooja</span>
-<p style="margin:8px 0 0; color: aliceblue;">Mulle meeldivad puhas kood, väljendusrikas tüpograafia ja korralikud vahed</p>
-<div class="skill" id="skills">
-<span class="skill">HTML5</span>
-<span class="skill">CSS3</span>
-<span class="skill">Flexbox</span>
-<span class="skill">Animatsioonid</span>
-</div>
-<div>
-    <article>
-<section>
+    <!-- ABOUT SECTION -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-header">
+                <h2 class="section-title">About Me</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>I'm a passionate web designer and developer with a keen eye for detail and a love for modern, clean design. I specialize in creating responsive, user-friendly interfaces that not only look stunning but also deliver an exceptional user experience.</p>
+                    <p>My passion lies in combining aesthetics with functionality, ensuring every pixel serves a purpose.</p>
+                </div>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <span class="skill-label">HTML5</span>
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-label">CSS3</span>
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-label">JavaScript</span>
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-label">Responsive Design</span>
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-label">UI/UX</span>
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-label">Figma</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section class="cards" id="works">
-       
-<a href="https://www.figma.com/proto/xWdqtRdAWaTROYeExkeAr0/Untitled?node-id=1-5&p=f&t=Km4IsGbPSzaWP6Je-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1">
-        <article class="mini">
-            <h3>Bank mockup</h3>
-            <p>Figma.</p>
-        </article>
-    </a>
-    <a href="https://www.figma.com/proto/J35aDwyiKNkw4vDnRFJ8RD/Untitled?node-id=13-310&starting-point-node-id=1%3A5&t=cUDfVSRIeEjIa7Mk-1">
-        <article class="mini">
-            <h3>Menü mockup</h3>
-            <p>Figma</p>
-        </article>
-    </a>
-    <a href="https://www.figma.com/proto/gmnIAls6yB8WBNlK8RYs4J/Untitled?node-id=3-95&p=f&t=NblNedKynGxnVse0-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=3%3A95">
-        <article class="mini">
-            <h3>Food mockup</h3>
-            <p>Figma</p>
-        </article>
-    </a>
+    <!-- WORK SECTION -->
+    <section id="work" class="work">
+        <div class="container">
+            <div class="about-header">
+                <h2 class="section-title">Featured Work</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="projects-grid">
+                <a href="https://www.figma.com/proto/xWdqtRdAWaTROYeExkeAr0/Untitled?node-id=1-5&p=f&t=Km4IsGbPSzaWP6Je-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1" target="_blank" class="project-card">
+                    <div class="project-icon">🏦</div>
+                    <h3>Bank App Design</h3>
+                    <p>Modern banking interface with seamless navigation</p>
+                    <span class="project-tag">Figma</span>
+                </a>
+                <a href="https://www.figma.com/proto/J35aDwyiKNkw4vDnRFJ8RD/Untitled?node-id=13-310&starting-point-node-id=1%3A5&t=cUDfVSRIeEjIa7Mk-1" target="_blank" class="project-card">
+                    <div class="project-icon">🍽️</div>
+                    <h3>Restaurant Menu</h3>
+                    <p>Clean and elegant menu design for dining experience</p>
+                    <span class="project-tag">Figma</span>
+                </a>
+                <a href="https://www.figma.com/proto/gmnIAls6yB8WBNlK8RYs4J/Untitled?node-id=3-95&p=f&t=NblNedKynGxnVse0-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=3%3A95" target="_blank" class="project-card">
+                    <div class="project-icon">🍕</div>
+                    <h3>Food Delivery App</h3>
+                    <p>User-centric interface for food ordering platform</p>
+                    <span class="project-tag">Figma</span>
+                </a>
+            </div>
+        </div>
+    </section>
 
-</section>
-<main>
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title contact-title">Let's Create Something Amazing</h2>
+            <p class="contact-subtitle">Have a project in mind? Let's talk and bring it to life.</p>
+            <div class="contact-methods">
+                <a href="mailto:hello@digikangelane.ee" class="contact-link">
+                    <span class="contact-icon">✉️</span>
+                    <div>
+                        <span class="contact-label">Email</span>
+                        <span class="contact-value">hello@digikangelane.ee</span>
+                    </div>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="contact-link">
+                    <span class="contact-icon">💼</span>
+                    <div>
+                        <span class="contact-label">LinkedIn</span>
+                        <span class="contact-value">Connect with me</span>
+                    </div>
+                </a>
+                <a href="https://github.com" target="_blank" class="contact-link">
+                    <span class="contact-icon">💻</span>
+                    <div>
+                        <span class="contact-label">GitHub</span>
+                        <span class="contact-value">View my code</span>
+                    </div>
+                </a>
+            </div>
+            <a href="mailto:hello@digikangelane.ee" class="btn btn-primary btn-large">Send Me a Message</a>
+        </div>
+    </section>
+</main>
 
-<footer id="start">
-2026 Digikangelane - tehtud armastusega CSS-i vastu
+<footer>
+    <div class="footer-container">
+        <div class="footer-content">
+            <p class="footer-text">© 2026 Digikangelane. Crafted with <span class="heart">❤️</span> and CSS.</p>
+            <div class="social-links">
+                <a href="https://github.com" target="_blank" title="GitHub" class="social-link">GitHub</a>
+                <a href="https://linkedin.com" target="_blank" title="LinkedIn" class="social-link">LinkedIn</a>
+                <a href="https://instagram.com" target="_blank" title="Instagram" class="social-link">Instagram</a>
+                <a href="https://twitter.com" target="_blank" title="Twitter" class="social-link">Twitter</a>
+            </div>
+        </div>
+    </div>
 </footer>
+
+<script src="./script.js"></script>
 </body>
 </html>
