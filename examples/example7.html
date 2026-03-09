@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Strength Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            padding: 50px;
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 0.95em;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 45px 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+        }
+
+        input[type="password"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #0066cc;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #0066cc;
+            transform: scale(1.1);
+        }
+
+        .strength-section {
+            margin-bottom: 30px;
+        }
+
+        .strength-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .strength-text {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            background: #f0f0f0;
+            color: #7f8c8d;
+        }
+
+        .strength-text.weak {
+            background: #ffe5e5;
+            color: #c92a2a;
+        }
+
+        .strength-text.fair {
+            background: #fff4e5;
+            color: #d97706;
+        }
+
+        .strength-text.good {
+            background: #e5f9e6;
+            color: #16a34a;
+        }
+
+        .strength-text.strong {
+            background: #e5f4ff;
+            color: #0284c7;
+        }
+
+        .strength-text.very-strong {
+            background: #d4f3e9;
+            color: #0891b2;
+        }
+
+        .strength-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: #bdbdbd;
+        }
+
+        .strength-fill.weak {
+            width: 20%;
+            background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+        }
+
+        .strength-fill.fair {
+            width: 40%;
+            background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+        }
+
+        .strength-fill.good {
+            width: 60%;
+            background: linear-gradient(90deg, #84cc16 0%, #bfdbfe 100%);
+        }
+
+        .strength-fill.strong {
+            width: 80%;
+            background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+        }
+
+        .strength-fill.very-strong {
+            width: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #047857 100%);
+        }
+
+        .requirements {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .requirements-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 0.95em;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+
+        .requirement-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .requirement-item.met .requirement-icon {
+            background: #10b981;
+            color: white;
+        }
+
+        .requirement-item.met {
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .requirement-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 20px;
+            margin-top: 25px;
+            font-size: 0.9em;
+            color: #0d47a1;
+            line-height: 1.5;
+        }
+
+        .info-icon {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        /* Password strength indicator summary */
+        .strength-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.85em;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .summary-item.active {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .summary-item-label {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75em;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .summary-item-value {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+
+            .strength-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Password Strength</h1>
+            <p class="subtitle">Check your password security</p>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Enter Password</label>
+            <div class="password-wrapper">
+                <input 
+                    type="password" 
+                    id="passwordInput" 
+                    placeholder="Type your password here..."
+                    autocomplete="off"
+                >
+                <button class="toggle-password" id="toggleBtn" onclick="togglePassword()">👁️</button>
+            </div>
+        </div>
+
+        <div class="strength-section">
+            <div class="strength-label">
+                <span>Strength Level</span>
+                <span class="strength-text" id="strengthText">None</span>
+            </div>
+            <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+            </div>
+        </div>
+
+        <div class="strength-summary" id="strengthSummary">
+            <div class="summary-item" id="lengthIndicator">
+                <div class="summary-item-label">Length</div>
+                <div class="summary-item-value" id="lengthValue">0</div>
+            </div>
+            <div class="summary-item" id="complexityIndicator">
+                <div class="summary-item-label">Complexity</div>
+                <div class="summary-item-value" id="complexityValue">0</div>
+            </div>
+        </div>
+
+        <div class="requirements">
+            <div class="requirements-title">Requirements</div>
+            <div class="requirement-item" id="req-length">
+                <div class="requirement-icon">✓</div>
+                <div class="requirement-text">At least 8 characters</div>
+            </div>
+            <div class="requirement-item" id="req-uppercase">
+                <div class="requirement-icon">✓</div>
+                <div class="requirement-text">Uppercase letter (A-Z)</div>
+            </div>
+            <div class="requirement-item" id="req-lowercase">
+                <div class="requirement-icon">✓</div>
+                <div class="requirement-text">Lowercase letter (a-z)</div>
+            </div>
+            <div class="requirement-item" id="req-number">
+                <div class="requirement-icon">✓</div>
+                <div class="requirement-text">Number (0-9)</div>
+            </div>
+            <div class="requirement-item" id="req-symbol">
+                <div class="requirement-icon">✓</div>
+                <div class="requirement-text">Symbol (!@#$%^&*)</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <span class="info-icon">ℹ️</span>
+            A strong password combines uppercase, lowercase, numbers, and symbols with sufficient length.
+        </div>
+    </div>
+
+    <script>
+        const passwordInput = document.getElementById('passwordInput');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const toggleBtn = document.getElementById('toggleBtn');
+
+        // Requirements
+        const requirements = {
+            length: { id: 'req-length', regex: /.{8,}/, met: false },
+            uppercase: { id: 'req-uppercase', regex: /[A-Z]/, met: false },
+            lowercase: { id: 'req-lowercase', regex: /[a-z]/, met: false },
+            number: { id: 'req-number', regex: /[0-9]/, met: false },
+            symbol: { id: 'req-symbol', regex: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, met: false }
+        };
+
+        // Toggle password visibility
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            toggleBtn.textContent = isPassword ? '🙈' : '👁️';
+        }
+
+        // Check password strength
+        function checkPassword() {
+            const password = passwordInput.value;
+            
+            // Check each requirement
+            let metCount = 0;
+            for (const [key, req] of Object.entries(requirements)) {
+                const isMet = req.regex.test(password);
+                req.met = isMet;
+                const element = document.getElementById(req.id);
+                
+                if (isMet) {
+                    element.classList.add('met');
+                    metCount++;
+                } else {
+                    element.classList.remove('met');
+                }
+            }
+
+            // Calculate strength score
+            const score = calculateStrength(password, metCount);
+            updateUI(score);
+        }
+
+        // Calculate strength score
+        function calculateStrength(password, metCount) {
+            let score = 0;
+
+            // Base score on met requirements
+            score += metCount * 15;
+
+            // Bonus points for length
+            if (password.length >= 16) score += 15;
+            else if (password.length >= 12) score += 10;
+            else if (password.length >= 8) score += 5;
+
+            // Bonus for variety
+            if (requirements.uppercase.met && requirements.lowercase.met) score += 5;
+            if (requirements.uppercase.met && requirements.lowercase.met && requirements.number.met) score += 5;
+            if (metCount === 5) score += 10; // All requirements met
+
+            return Math.min(score, 100);
+        }
+
+        // Update UI based on score
+        function updateUI(score) {
+            let strength = 'None';
+            let strengthClass = '';
+
+            if (score === 0) {
+                strength = 'None';
+                strengthClass = '';
+            } else if (score < 25) {
+                strength = 'Very Weak';
+                strengthClass = 'weak';
+            } else if (score < 50) {
+                strength = 'Weak';
+                strengthClass = 'weak';
+            } else if (score < 65) {
+                strength = 'Fair';
+                strengthClass = 'fair';
+            } else if (score < 80) {
+                strength = 'Good';
+                strengthClass = 'good';
+            } else if (score < 95) {
+                strength = 'Strong';
+                strengthClass = 'strong';
+            } else {
+                strength = 'Very Strong';
+                strengthClass = 'very-strong';
+            }
+
+            // Update strength text and bar
+            strengthText.textContent = strength;
+            strengthText.className = 'strength-text ' + strengthClass;
+            
+            strengthFill.className = 'strength-fill ' + strengthClass;
+
+            // Update summary indicators
+            updateSummary(passwordInput.value.length, score);
+        }
+
+        // Update summary
+        function updateSummary(length, score) {
+            const lengthValue = document.getElementById('lengthValue');
+            const complexityValue = document.getElementById('complexityValue');
+            const lengthIndicator = document.getElementById('lengthIndicator');
+            const complexityIndicator = document.getElementById('complexityIndicator');
+
+            lengthValue.textContent = length;
+            complexityValue.textContent = score;
+
+            // Activate indicators
+            if (length >= 8) {
+                lengthIndicator.classList.add('active');
+            } else {
+                lengthIndicator.classList.remove('active');
+            }
+
+            if (score >= 65) {
+                complexityIndicator.classList.add('active');
+            } else {
+                complexityIndicator.classList.remove('active');
+            }
+        }
+
+        // Event listener
+        passwordInput.addEventListener('input', checkPassword);
+
+        // Initialize
+        checkPassword();
+    </script>
+</body>
+</html>

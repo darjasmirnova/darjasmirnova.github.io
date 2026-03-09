@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll-Driven Scaling</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .scalable {
+            display: inline-block;
+            margin: 20px;
+            padding: 20px;
+            background: #007bff;
+            color: white;
+            border-radius: 10px;
+            transition: transform 0.1s;
+        }
+        .spacer {
+            height: 100vh;
+            background: linear-gradient(to bottom, #ffcccc, #ccffcc);
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Scroll to Scale Elements</h1>
+        <div class="scalable" id="box1">Box 1</div>
+        <div class="scalable" id="box2">Box 2</div>
+        <div class="scalable" id="box3">Box 3</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="content">
+        <div class="scalable" id="box4">Box 4</div>
+        <div class="scalable" id="box5">Box 5</div>
+    </div>
+    <div class="spacer"></div>
+    <script>
+        const scalables = document.querySelectorAll('.scalable');
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const scale = 1 + scrollY / 1000; // Scale up as you scroll
+            scalables.forEach(el => {
+                el.style.transform = `scale(${scale})`;
+            });
+        });
+    </script>
+</body>
+</html>

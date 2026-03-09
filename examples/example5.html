@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Boss Phrase Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(20, 20, 40, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(120deg, #00d4ff 0%, #7c3aed 50%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #7dd3fc;
+            opacity: 0.85;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .phrase-display {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .phrase-display:hover {
+            border-color: rgba(0, 212, 255, 0.6);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+        }
+
+        .phrase-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translate(-100%, -100%) rotate(45deg);
+            }
+            100% {
+                transform: translate(100%, 100%) rotate(45deg);
+            }
+        }
+
+        .phrase-text {
+            font-size: 1.6em;
+            font-weight: 600;
+            line-height: 1.6;
+            text-align: center;
+            color: #00d4ff;
+            position: relative;
+            z-index: 2;
+            word-break: break-word;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .phrase-text.new {
+            animation: phraseEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes phraseEntry {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            border: 2px solid #0099ff;
+            background: rgba(0, 153, 255, 0.1);
+            color: #0099ff;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 153, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: 0;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            border-color: #0099ff;
+            box-shadow: 0 0 25px rgba(0, 153, 255, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-secondary {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+            color: #a78bfa;
+        }
+
+        .btn-secondary::before {
+            background: rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-secondary:hover {
+            border-color: #a78bfa;
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.5);
+        }
+
+        .stats {
+            text-align: center;
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 25px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #7dd3fc;
+            display: inline;
+            margin-right: 8px;
+        }
+
+        .stat-value {
+            color: #00d4ff;
+            font-weight: 700;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            animation: notificationSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), notificationSlideOut 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 2.6s;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes notificationSlide {
+            from {
+                opacity: 0;
+                transform: translateX(100px) translateY(-50%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+        }
+
+        @keyframes notificationSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        .decoration {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        .decoration-1 {
+            width: 300px;
+            height: 300px;
+            background: #00d4ff;
+            top: -100px;
+            right: -100px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .decoration-2 {
+            width: 250px;
+            height: 250px;
+            background: #7c3aed;
+            bottom: -80px;
+            left: -80px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(30px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 1.8em;
+            }
+
+            .phrase-text {
+                font-size: 1.3em;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .copy-notification {
+                right: 15px;
+                left: 15px;
+                top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">💼 Corporate Boss Phrases</h1>
+            <p class="subtitle">Generate Motivational Nonsense</p>
+        </div>
+
+        <div class="phrase-display">
+            <div class="phrase-text" id="phraseText">
+                Let's circle back on this and touch base offline...
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" onclick="generatePhrase()">
+                <span>Generate New Phrase</span>
+            </button>
+            <button class="btn btn-secondary" onclick="copyToClipboard()">
+                <span>📋 Copy Phrase</span>
+            </button>
+        </div>
+
+        <div class="stats">
+            <span class="stat-label">Phrases Generated:</span>
+            <span class="stat-value" id="counter">1</span>
+        </div>
+    </div>
+
+    <script>
+        // Corporate boss phrase database
+        const phrases = [
+            "Let's circle back on this and touch base offline...",
+            "We need to be more agile and synergize our efforts.",
+            "I'll need you to really think outside the box here.",
+            "Can you take this offline and loop me in?",
+            "Let's boil the ocean and see what sticks.",
+            "We need to pivot and double down on our core competencies.",
+            "I'm going to need a deck on this by EOD.",
+            "Let's table this and reconvene next quarter.",
+            "We need to move the needle on engagement metrics.",
+            "This is a game changer. We're disrupting the space.",
+            "Let's low-ball this and see if anyone bites.",
+            "I need to see more engagement from your team.",
+            "We're bleeding red, we need to stop the bleeding NOW.",
+            "Stop thinking like an individual contributor.",
+            "This is a bandwidth issue at this point in time.",
+            "We need to leverage our synergies better.",
+            "Let's make sure we're all on the same page here.",
+            "I want to make sure we're maximizing ROI on this.",
+            "We need to take a step back and recalibrate.",
+            "I'll need this socialized before we present upstairs.",
+            "We're in a holding pattern until we hear back from legal.",
+            "Can you unblock this and get back to me?",
+            "I want to drill down on these numbers real quick.",
+            "We need to put more wood behind the arrow here.",
+            "This is a non-starter unless we can get buy-in.",
+            "Let's grab some face time and workshop this.",
+            "We need to ideate on how to move forward here.",
+            "I'm not trying to boil the ocean, but...",
+            "This initiative needs some TLC moving forward.",
+            "Can we get this over the finish line before EOQ?",
+            "We need to make sure this scales properly.",
+            "Let's not get caught up in the weeds here.",
+            "I need you to take point on this and own it.",
+            "We're going to need to get creative with the budget.",
+            "This is a key initiative for the organization.",
+            "Let's make sure we're aligned on next steps.",
+            "I want quarterly reviews on the progress here.",
+            "We need to be strategic about how we resource this.",
+            "Can you walk me through the value prop again?",
+            "This is a critical success factor for Q4.",
+            "We need to minimize our blast radius on this.",
+            "Let's make this a priority and get it into the queue.",
+            "I'm going to need more visibility into this process.",
+            "We need to hardcode this into our roadmap.",
+            "Can we table this and come back to it next sprint?",
+            "This is a conversation we should have offline.",
+            "We need to find some quick wins here.",
+            "Let's shift gears and try a different approach.",
+            "I want you to socialize this idea with the team first.",
+            "We're going to need stakeholder alignment on this.",
+            "This is generating buzz but we need real metrics.",
+            "Let's cut through the noise and focus on what matters.",
+            "I need this to be more data-driven and less anecdotal.",
+            "We need to wear our thinking caps on this one.",
+            "Can you spit-ball some ideas for me?",
+            "This is a heavyweight topic that needs executive buy-in.",
+            "Let's sandbox this and see if it passes muster.",
+            "We need to be more proactive, not reactive.",
+            "I want this to be a win-win for everyone involved.",
+            "Can we get some proof points before we scale?",
+            "This needs to be a North Star for the team.",
+            "We're going to need to break this down into chunks.",
+            "Let's make sure we have all the stakeholders in the room.",
+            "This is where we can really move the needle.",
+            "I want this to be a priority starting Monday.",
+            "We need to have a kanban board for tracking this.",
+            "Can we get a read on this from the customers?",
+            "This is a test and learn situation at this point.",
+            "Let's get some buy-in and move this forward.",
+            "We need to make sure this is mission-critical.",
+            "I want a war room on this by tomorrow morning.",
+            "This is a strategic initiative, not a tactical fix.",
+            "Can you put some guardrails around this?",
+            "We need to make sure we're not leaving money on the table.",
+            "Let's find the low-hanging fruit first.",
+        ];
+
+        let phraseCount = 0;
+        const phraseTextEl = document.getElementById('phraseText');
+        const counterEl = document.getElementById('counter');
+        let currentPhrase = phrases[0];
+
+        // Generate random phrase
+        function generatePhrase() {
+            const randomIndex = Math.floor(Math.random() * phrases.length);
+            currentPhrase = phrases[randomIndex];
+            phraseCount++;
+            counterEl.textContent = phraseCount;
+
+            // Add animation class
+            phraseTextEl.classList.remove('new');
+            // Trigger reflow to restart animation
+            void phraseTextEl.offsetWidth;
+            phraseTextEl.classList.add('new');
+
+            // Update text
+            phraseTextEl.textContent = currentPhrase;
+
+            // Save to localStorage
+            saveState();
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            navigator.clipboard.writeText(currentPhrase).then(() => {
+                showNotification('✓ Copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = currentPhrase;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showNotification('✓ Copied to clipboard!');
+            });
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'copy-notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Save state
+        function saveState() {
+            localStorage.setItem('corporatePhraseCount', phraseCount);
+        }
+
+        // Load state
+        function loadState() {
+            const saved = localStorage.getItem('corporatePhraseCount');
+            if (saved) {
+                phraseCount = parseInt(saved);
+                counterEl.textContent = phraseCount;
+            }
+        }
+
+        // Initialize
+        loadState();
+        phraseTextEl.textContent = currentPhrase;
+
+        // Allow Enter key to generate phrase
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generatePhrase();
+            }
+        });
+    </script>
+</body>
+</html>

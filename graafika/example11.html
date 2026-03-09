@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticker Slap - Kleebi Klõpsamine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: crosshair;
+            position: relative;
+        }
+
+        /* Info paneel */
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .info-panel h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Statistika paneel */
+        .stats-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 20px;
+        }
+
+        .stats-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-value {
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Nupud paneel */
+        .controls-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            pointer-events: all;
+        }
+
+        button:hover {
+            background: #333;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Kleebis */
+        .sticker {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            animation: stickerAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center center;
+        }
+
+        @keyframes stickerAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotate(var(--rotation));
+            }
+        }
+
+        /* Kleebise suurused */
+        .sticker.small { font-size: 40px; }
+        .sticker.medium { font-size: 60px; }
+        .sticker.large { font-size: 80px; }
+
+        /* SVG kleebised */
+        .sticker svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Kleebiste galerii */
+        .sticker-gallery {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 200px;
+        }
+
+        .sticker-gallery h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .gallery-item {
+            font-size: 30px;
+            text-align: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            pointer-events: all;
+        }
+
+        .gallery-item:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.2);
+        }
+
+        .gallery-item.selected {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4CAF50;
+        }
+
+        /* Klikkimise efekt */
+        .click-effect {
+            position: absolute;
+            pointer-events: none;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: clickRipple 0.6s ease-out;
+        }
+
+        @keyframes clickRipple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 100px;
+                height: 100px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="info-panel">
+        <h1>🎨 Sticker Slap</h1>
+        <p>Klõpsake kõikjal, et lisada kleebiseid!</p>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stats-item">
+            <span class="stats-label">Kleebiseid:</span>
+            <span class="stats-value" id="stickerCount">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Klõpse:</span>
+            <span class="stats-value" id="clickCount">0</span>
+        </div>
+    </div>
+
+    <div class="sticker-gallery">
+        <h3>Vali kleebis:</h3>
+        <div class="gallery-grid">
+            <div class="gallery-item selected" data-sticker="😀">😀</div>
+            <div class="gallery-item" data-sticker="❤️">❤️</div>
+            <div class="gallery-item" data-sticker="⭐">⭐</div>
+            <div class="gallery-item" data-sticker="🎉">🎉</div>
+            <div class="gallery-item" data-sticker="🔥">🔥</div>
+            <div class="gallery-item" data-sticker="👍">👍</div>
+            <div class="gallery-item" data-sticker="🌈">🌈</div>
+            <div class="gallery-item" data-sticker="🎵">🎵</div>
+            <div class="gallery-item" data-sticker="💎">💎</div>
+            <div class="gallery-item" data-sticker="🍕">🍕</div>
+            <div class="gallery-item" data-sticker="🎮">🎮</div>
+            <div class="gallery-item" data-sticker="🚀">🚀</div>
+            <div class="gallery-item" data-sticker="🌟">🌟</div>
+            <div class="gallery-item" data-sticker="💫">💫</div>
+            <div class="gallery-item" data-sticker="🎨">🎨</div>
+            <div class="gallery-item" data-sticker="🎪">🎪</div>
+            <div class="gallery-item" data-sticker="🦄">🦄</div>
+            <div class="gallery-item" data-sticker="🌺">🌺</div>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <button id="clearBtn">🗑️ Tühjenda</button>
+        <button id="randomBtn">🎲 Juhuslik</button>
+        <button id="sizeBtn">📏 Suurus: Keskmine</button>
+    </div>
+
+    <script>
+        let stickerCount = 0;
+        let clickCount = 0;
+        let selectedSticker = '😀';
+        let randomMode = false;
+        let stickerSize = 'medium';
+
+        const stickerCountEl = document.getElementById('stickerCount');
+        const clickCountEl = document.getElementById('clickCount');
+        const clearBtn = document.getElementById('clearBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const sizeBtn = document.getElementById('sizeBtn');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+
+        // Kleebiste loend
+        const stickers = [
+            '😀', '😂', '😍', '🥳', '😎', '🤩', '😻', '🙌',
+            '❤️', '💙', '💚', '💛', '💜', '🧡', '💖', '💕',
+            '⭐', '✨', '💫', '🌟', '⚡', '🔥', '💥', '✌️',
+            '🎉', '🎊', '🎈', '🎁', '🎀', '🎂', '🍰', '🧁',
+            '🌈', '☀️', '🌙', '⛅', '🌸', '🌺', '🌻', '🌹',
+            '🎵', '🎶', '🎸', '🎹', '🎤', '🎧', '🎼', '🎺',
+            '💎', '👑', '🏆', '🥇', '🎯', '🎪', '🎭', '🎨',
+            '🍕', '🍔', '🍟', '🌮', '🍩', '🍪', '🍦', '🍓',
+            '🎮', '🕹️', '👾', '🚀', '🛸', '✈️', '🚁', '🦄'
+        ];
+
+        // Galerii valiku haldamine
+        galleryItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                galleryItems.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedSticker = item.dataset.sticker;
+                randomMode = false;
+                randomBtn.textContent = '🎲 Juhuslik';
+            });
+        });
+
+        // Juhuslik režiim
+        randomBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            randomMode = !randomMode;
+            if (randomMode) {
+                randomBtn.textContent = '🎲 Juhuslik ✓';
+                randomBtn.style.background = '#4CAF50';
+                randomBtn.style.color = 'white';
+                galleryItems.forEach(i => i.classList.remove('selected'));
+            } else {
+                randomBtn.textContent = '🎲 Juhuslik';
+                randomBtn.style.background = '';
+                randomBtn.style.color = '';
+            }
+        });
+
+        // Suuruse vahetamine
+        const sizes = ['small', 'medium', 'large'];
+        const sizeNames = ['Väike', 'Keskmine', 'Suur'];
+        let currentSizeIndex = 1;
+
+        sizeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentSizeIndex = (currentSizeIndex + 1) % sizes.length;
+            stickerSize = sizes[currentSizeIndex];
+            sizeBtn.textContent = `📏 Suurus: ${sizeNames[currentSizeIndex]}`;
+        });
+
+        // Tühjenda kõik kleebised
+        clearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const allStickers = document.querySelectorAll('.sticker');
+            allStickers.forEach(sticker => {
+                sticker.style.animation = 'none';
+                sticker.style.transition = 'all 0.3s ease';
+                sticker.style.transform = 'translate(-50%, -50%) scale(0)';
+                sticker.style.opacity = '0';
+            });
+            
+            setTimeout(() => {
+                allStickers.forEach(sticker => sticker.remove());
+            }, 300);
+
+            stickerCount = 0;
+            clickCount = 0;
+            updateStats();
+        });
+
+        // Klikkimise kuulamine
+        document.addEventListener('click', (e) => {
+            // Kontrolli, kas klõpsati nupul või galeriil
+            if (e.target.closest('button') || e.target.closest('.sticker-gallery')) {
+                return;
+            }
+
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // Lisa kleebis
+            createSticker(x, y);
+
+            // Lisa klikkimise efekt
+            createClickEffect(x, y);
+
+            clickCount++;
+            updateStats();
+        });
+
+        // Loo kleebis
+        function createSticker(x, y) {
+            const sticker = document.createElement('div');
+            sticker.className = `sticker ${stickerSize}`;
+            
+            // Vali kleebis
+            const stickerEmoji = randomMode 
+                ? stickers[Math.floor(Math.random() * stickers.length)]
+                : selectedSticker;
+            
+            sticker.textContent = stickerEmoji;
+            
+            // Juhuslik pööramine
+            const rotation = Math.random() * 360 - 180; // -180 kuni 180 kraadi
+            sticker.style.setProperty('--rotation', `${rotation}deg`);
+            
+            // Positsioon
+            sticker.style.left = `${x}px`;
+            sticker.style.top = `${y}px`;
+            
+            // Lisa sisse kihi efekt
+            const scale = 0.9 + Math.random() * 0.2; // 0.9-1.1
+            sticker.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${rotation}deg)`;
+            
+            document.body.appendChild(sticker);
+            stickerCount++;
+            updateStats();
+
+            // Eemalda vanad kleebised, kui neid on liiga palju
+            const allStickers = document.querySelectorAll('.sticker');
+            if (allStickers.length > 200) {
+                allStickers[0].remove();
+                stickerCount--;
+            }
+        }
+
+        // Loo klikkimise efekt
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            effect.style.transform = 'translate(-50%, -50%)';
+            
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 600);
+        }
+
+        // Uuenda statistikat
+        function updateStats() {
+            stickerCountEl.textContent = stickerCount;
+            clickCountEl.textContent = clickCount;
+        }
+
+        // Klaviatuuri kiirklahvid
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'c' || e.key === 'C') {
+                clearBtn.click();
+            } else if (e.key === 'r' || e.key === 'R') {
+                randomBtn.click();
+            } else if (e.key === 's' || e.key === 'S') {
+                sizeBtn.click();
+            } else if (e.key >= '1' && e.key <= '9') {
+                const index = parseInt(e.key) - 1;
+                if (galleryItems[index]) {
+                    galleryItems[index].click();
+                }
+            }
+        });
+
+        // Tervitus animatsioon
+        window.addEventListener('load', () => {
+            const welcomePositions = [
+                { x: window.innerWidth * 0.2, y: window.innerHeight * 0.3 },
+                { x: window.innerWidth * 0.5, y: window.innerHeight * 0.4 },
+                { x: window.innerWidth * 0.8, y: window.innerHeight * 0.3 },
+            ];
+
+            welcomePositions.forEach((pos, i) => {
+                setTimeout(() => {
+                    createSticker(pos.x, pos.y);
+                }, i * 200);
+            });
+        });
+    </script>
+</body>
+</html>

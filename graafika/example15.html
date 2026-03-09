@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover Filter Swap - Filtrite Vahetamine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Pealkiri */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 42px;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .header p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Galerii konteiner */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Pildi kaart */
+        .image-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #2a2a2a;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Pilt */
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 aspect ratio */
+            overflow: hidden;
+        }
+
+        .image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.5s ease, transform 0.5s ease;
+        }
+
+        /* Info overlay */
+        .info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 20px;
+            color: white;
+            z-index: 2;
+            transition: opacity 0.3s ease;
+        }
+
+        .filter-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .filter-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Filtrite efektid */
+        
+        /* 1. Must-valge -> Neon värvid */
+        .filter-grayscale-neon .image {
+            filter: grayscale(100%);
+        }
+        .filter-grayscale-neon:hover .image {
+            filter: hue-rotate(180deg) saturate(300%) brightness(1.2);
+        }
+
+        /* 2. Tavaline -> Inverted */
+        .filter-normal-invert .image {
+            filter: none;
+        }
+        .filter-normal-invert:hover .image {
+            filter: invert(100%);
+        }
+
+        /* 3. Tuhm -> Kirkad värvid */
+        .filter-dull-vibrant .image {
+            filter: grayscale(80%) brightness(0.7);
+        }
+        .filter-dull-vibrant:hover .image {
+            filter: saturate(400%) contrast(120%) brightness(1.1);
+        }
+
+        /* 4. Sepia -> Neon sinine */
+        .filter-sepia-blue .image {
+            filter: sepia(100%);
+        }
+        .filter-sepia-blue:hover .image {
+            filter: hue-rotate(180deg) saturate(500%) brightness(1.3);
+        }
+
+        /* 5. Blur -> Sharp */
+        .filter-blur-sharp .image {
+            filter: blur(8px) brightness(0.8);
+        }
+        .filter-blur-sharp:hover .image {
+            filter: blur(0) contrast(150%) brightness(1.2);
+        }
+
+        /* 6. Tavaline -> Psühhedelik */
+        .filter-normal-psychedelic .image {
+            filter: grayscale(50%);
+        }
+        .filter-normal-psychedelic:hover .image {
+            filter: hue-rotate(270deg) saturate(600%) contrast(150%);
+        }
+
+        /* 7. Must-valge -> Punane */
+        .filter-bw-red .image {
+            filter: grayscale(100%);
+        }
+        .filter-bw-red:hover .image {
+            filter: sepia(100%) hue-rotate(-50deg) saturate(400%);
+        }
+
+        /* 8. Madal kontrast -> Kõrge kontrast */
+        .filter-low-high .image {
+            filter: contrast(50%) brightness(1.2);
+        }
+        .filter-low-high:hover .image {
+            filter: contrast(200%) saturate(150%);
+        }
+
+        /* 9. Negatiivsed värvid -> Neon */
+        .filter-negative-neon .image {
+            filter: invert(100%) grayscale(100%);
+        }
+        .filter-negative-neon:hover .image {
+            filter: hue-rotate(90deg) saturate(500%) brightness(1.5);
+        }
+
+        /* 10. Külm -> Soe */
+        .filter-cool-warm .image {
+            filter: hue-rotate(180deg) saturate(70%);
+        }
+        .filter-cool-warm:hover .image {
+            filter: hue-rotate(0deg) saturate(150%) brightness(1.1);
+        }
+
+        /* 11. Tuhm -> Kuldne */
+        .filter-dull-golden .image {
+            filter: grayscale(60%) brightness(0.8);
+        }
+        .filter-dull-golden:hover .image {
+            filter: sepia(100%) saturate(200%) hue-rotate(-10deg) brightness(1.2);
+        }
+
+        /* 12. Tavaline -> Matrix */
+        .filter-normal-matrix .image {
+            filter: grayscale(40%);
+        }
+        .filter-normal-matrix:hover .image {
+            filter: hue-rotate(90deg) saturate(300%) contrast(130%) brightness(0.9);
+        }
+
+        /* Gradient taustapildid */
+        .gradient-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .gradient-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .gradient-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .gradient-5 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .gradient-6 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .gradient-7 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .gradient-8 {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+        }
+
+        .gradient-9 {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .gradient-10 {
+            background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%);
+        }
+
+        .gradient-11 {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+
+        .gradient-12 {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+
+        /* Mustreid simuleerivad elemendid */
+        .pattern {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .pattern::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 10%, transparent 10%),
+                radial-gradient(circle at 60% 70%, rgba(255,255,255,0.15) 15%, transparent 15%),
+                radial-gradient(circle at 80% 30%, rgba(255,255,255,0.1) 12%, transparent 12%);
+            background-size: 100px 100px;
+            animation: patternMove 20s linear infinite;
+        }
+
+        @keyframes patternMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Kontrollpaneel */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .controls button {
+            width: 100%;
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .controls button:last-child {
+            margin-bottom: 0;
+        }
+
+        .controls button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        /* Hover juhis */
+        .hover-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 3;
+        }
+
+        .image-card:hover .hover-hint {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Hover Filter Swap</h1>
+        <p>Viige hiir piltide kohale ja vaadake filtrite maagilisi muutuseid!</p>
+    </div>
+
+    <div class="gallery">
+        <!-- Filter 1: Grayscale -> Neon -->
+        <div class="image-card filter-grayscale-neon">
+            <div class="image-wrapper">
+                <div class="image gradient-1 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Must-Valge → Neon</div>
+                <div class="filter-desc">Grayscale muutub neoonvärviks</div>
+            </div>
+        </div>
+
+        <!-- Filter 2: Normal -> Inverted -->
+        <div class="image-card filter-normal-invert">
+            <div class="image-wrapper">
+                <div class="image gradient-2 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Tavaline → Inverteeritud</div>
+                <div class="filter-desc">Värvid pöörduvad vastandiks</div>
+            </div>
+        </div>
+
+        <!-- Filter 3: Dull -> Vibrant -->
+        <div class="image-card filter-dull-vibrant">
+            <div class="image-wrapper">
+                <div class="image gradient-3 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Tuhm → Erkkirkad</div>
+                <div class="filter-desc">Tuhmid värvid muutuvad elavamaiks</div>
+            </div>
+        </div>
+
+        <!-- Filter 4: Sepia -> Blue Neon -->
+        <div class="image-card filter-sepia-blue">
+            <div class="image-wrapper">
+                <div class="image gradient-4 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Sepia → Sinine Neon</div>
+                <div class="filter-desc">Vanamoodne muutub futuristlikuks</div>
+            </div>
+        </div>
+
+        <!-- Filter 5: Blur -> Sharp -->
+        <div class="image-card filter-blur-sharp">
+            <div class="image-wrapper">
+                <div class="image gradient-5 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Hägune → Terav</div>
+                <div class="filter-desc">Blur kaob ja kontrast tõuseb</div>
+            </div>
+        </div>
+
+        <!-- Filter 6: Normal -> Psychedelic -->
+        <div class="image-card filter-normal-psychedelic">
+            <div class="image-wrapper">
+                <div class="image gradient-6 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Tavaline → Psühhedelik</div>
+                <div class="filter-desc">Ekstreemne värvinihe ja saturatsioon</div>
+            </div>
+        </div>
+
+        <!-- Filter 7: BW -> Red -->
+        <div class="image-card filter-bw-red">
+            <div class="image-wrapper">
+                <div class="image gradient-7 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Must-Valge → Punane</div>
+                <div class="filter-desc">Monokroom muutub punaseks</div>
+            </div>
+        </div>
+
+        <!-- Filter 8: Low -> High Contrast -->
+        <div class="image-card filter-low-high">
+            <div class="image-wrapper">
+                <div class="image gradient-8 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Madal → Kõrge Kontrast</div>
+                <div class="filter-desc">Dramaatiline kontrasti tõus</div>
+            </div>
+        </div>
+
+        <!-- Filter 9: Negative -> Neon -->
+        <div class="image-card filter-negative-neon">
+            <div class="image-wrapper">
+                <div class="image gradient-9 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Negatiiv → Neon</div>
+                <div class="filter-desc">Inverdud must-valge muutub neooniks</div>
+            </div>
+        </div>
+
+        <!-- Filter 10: Cool -> Warm -->
+        <div class="image-card filter-cool-warm">
+            <div class="image-wrapper">
+                <div class="image gradient-10 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Külm → Soe</div>
+                <div class="filter-desc">Temperatuuri nihe külmast soojaks</div>
+            </div>
+        </div>
+
+        <!-- Filter 11: Dull -> Golden -->
+        <div class="image-card filter-dull-golden">
+            <div class="image-wrapper">
+                <div class="image gradient-11 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Tuhm → Kuldne</div>
+                <div class="filter-desc">Hall muutub kullaseks sepiaks</div>
+            </div>
+        </div>
+
+        <!-- Filter 12: Normal -> Matrix -->
+        <div class="image-card filter-normal-matrix">
+            <div class="image-wrapper">
+                <div class="image gradient-12 pattern"></div>
+                <div class="hover-hint">✨ Hover!</div>
+            </div>
+            <div class="info-overlay">
+                <div class="filter-name">Tavaline → Matrix</div>
+                <div class="filter-desc">Roheline Matrix efekt</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="randomBtn">🎲 Randomiseeri</button>
+        <button id="infoBtn">ℹ️ Info</button>
+    </div>
+
+    <script>
+        const randomBtn = document.getElementById('randomBtn');
+        const infoBtn = document.getElementById('infoBtn');
+        const imageCards = document.querySelectorAll('.image-card');
+
+        // Randomiseeri gradiente
+        randomBtn.addEventListener('click', () => {
+            imageCards.forEach(card => {
+                const image = card.querySelector('.image');
+                const randomGradient = Math.floor(Math.random() * 12) + 1;
+                
+                // Eemalda kõik gradient klassid
+                for (let i = 1; i <= 12; i++) {
+                    image.classList.remove(`gradient-${i}`);
+                }
+                
+                // Lisa uus gradient
+                image.classList.add(`gradient-${randomGradient}`);
+            });
+        });
+
+        // Info nupp
+        infoBtn.addEventListener('click', () => {
+            alert(
+                '🎨 Hover Filter Swap\n\n' +
+                'CSS filtrid, mida kasutatakse:\n' +
+                '• grayscale() - Must-valge efekt\n' +
+                '• invert() - Pöörab värvid ümber\n' +
+                '• saturate() - Suurendab värvi intensiivsust\n' +
+                '• hue-rotate() - Muudab värvioone\n' +
+                '• blur() - Hägustab pilti\n' +
+                '• contrast() - Muudab kontrasti\n' +
+                '• brightness() - Muudab heledust\n' +
+                '• sepia() - Vanamoodne tooniefekt\n\n' +
+                'Viige hiir piltide kohale maagia nägemiseks!'
+            );
+        });
+
+        // Lisage animatsioon kaartidele laadimisel
+        window.addEventListener('load', () => {
+            imageCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Klaviatuuri kiirklahv
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                randomBtn.click();
+            } else if (e.key === 'i' || e.key === 'I') {
+                infoBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

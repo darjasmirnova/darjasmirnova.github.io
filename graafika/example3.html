@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Background Gradient</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            transition: background 0.1s; /* Smooth transition */
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Define corner colors (RGB)
+        const colors = {
+            topLeft: [0, 0, 255],     // Blue
+            topRight: [255, 0, 0],    // Red
+            bottomLeft: [0, 255, 0],  // Green
+            bottomRight: [255, 255, 0] // Yellow
+        };
+
+        function interpolateColor(color1, color2, factor) {
+            return color1.map((c, i) => Math.round(c + (color2[i] - c) * factor));
+        }
+
+        function getColorAtPosition(nx, ny) {
+            const top = interpolateColor(colors.topLeft, colors.topRight, nx);
+            const bottom = interpolateColor(colors.bottomLeft, colors.bottomRight, nx);
+            return interpolateColor(top, bottom, ny);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const nx = e.clientX / window.innerWidth;
+            const ny = e.clientY / window.innerHeight;
+            const [r, g, b] = getColorAtPosition(nx, ny);
+            document.body.style.background = `rgb(${r}, ${g}, ${b})`;
+        });
+
+        // Initial color
+        document.body.style.background = `rgb(${colors.topLeft.join(',')})`;
+    </script>
+</body>
+</html>

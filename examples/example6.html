@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logical Fallacies Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .progress-section {
+            padding: 25px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.4s ease-out;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .progress-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .content {
+            padding: 40px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-content {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .question-number {
+            font-size: 0.85em;
+            color: #667eea;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .statement {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #2c3e50;
+            font-style: italic;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 18px 20px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2c3e50;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(4px);
+        }
+
+        .option-btn:hover::before {
+            background: #667eea;
+            width: 4px;
+        }
+
+        .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-btn.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .option-btn.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .option-btn.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .explanation-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .explanation-label {
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        .explanation-text {
+            color: #1e40af;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%);
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 153, 255, 0.6);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-restart {
+            background: #e3f2fd;
+            color: #0066cc;
+            border: 2px solid #0066cc;
+        }
+
+        .btn-restart:hover {
+            background: #0066cc;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Results Screen */
+        .results-screen {
+            text-align: center;
+        }
+
+        .results-title {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .score-display {
+            font-size: 4em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .score-text {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        .results-message {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .results-message strong {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 3px solid #667eea;
+        }
+
+        .stat-card.correct {
+            border-top-color: #10b981;
+        }
+
+        .stat-card.incorrect {
+            border-top-color: #ef4444;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card.correct .stat-number {
+            color: #10b981;
+        }
+
+        .stat-card.incorrect .stat-number {
+            color: #ef4444;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .content {
+                padding: 25px 20px;
+                min-height: 300px;
+            }
+
+            .statement {
+                font-size: 1em;
+                padding: 20px;
+            }
+
+            .score-display {
+                font-size: 3em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Logical Fallacies Quiz</h1>
+            <p>Test your knowledge of common logical fallacies</p>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressLabel">Question 1 of 10</span>
+                <span class="progress-score">Score: <span id="scoreDisplay">0</span>/10</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="quiz-content" id="quizContent"></div>
+            <div id="resultsContent" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz data
+        const quizData = [
+            {
+                statement: "Eating organic food is better because everyone at the gym eats organic food.",
+                options: ["Ad Hominem", "Appeal to Authority", "Bandwagon Fallacy", "Red Herring"],
+                correct: 2,
+                explanation: "This is a Bandwagon Fallacy (appeal to popularity). Just because many people do something doesn't make it right or true."
+            },
+            {
+                statement: "You should listen to this doctor about climate change because they're very attractive.",
+                options: ["Slippery Slope", "Appeal to Authority", "Ad Hominem", "Genetic Fallacy"],
+                correct: 2,
+                explanation: "This is Ad Hominem. This type of argument attacks the person rather than addressing the actual claim or evidence."
+            },
+            {
+                statement: "If we allow people to work from home one day per week, soon everyone will be working from home permanently.",
+                options: ["Appeal to Emotion", "Slippery Slope", "Straw Man", "False Dilemma"],
+                correct: 1,
+                explanation: "This is a Slippery Slope Fallacy. It assumes that one event will lead to a chain of undesirable consequences without evidence."
+            },
+            {
+                statement: "You must either support this policy completely or you don't care about the environment at all.",
+                options: ["False Dilemma", "Hasty Generalization", "Circular Reasoning", "Equivocation"],
+                correct: 0,
+                explanation: "This is a False Dilemma (false dichotomy). It presents only two options when more exist, forcing an artificial choice."
+            },
+            {
+                statement: "The CEO says drinking coffee is unhealthy, so it must be unhealthy.",
+                options: ["Hasty Generalization", "Appeal to Authority", "Post Hoc Ergo Propter Hoc", "Begging the Question"],
+                correct: 1,
+                explanation: "This is Appeal to Authority. Just because someone is in a position of authority doesn't mean their unsupported claims are true."
+            },
+            {
+                statement: "Video games cause violence because violent criminals have played video games.",
+                options: ["Correlation vs Causation", "Post Hoc Ergo Propter Hoc", "Hasty Generalization", "Straw Man"],
+                correct: 1,
+                explanation: "This is Post Hoc Ergo Propter Hoc (correlation vs causation). Just because two things happen together doesn't mean one causes the other."
+            },
+            {
+                statement: "Young people in my town are reckless, so all young people everywhere are reckless.",
+                options: ["Red Herring", "Hasty Generalization", "False Cause", "Ad Hominem"],
+                correct: 1,
+                explanation: "This is a Hasty Generalization. Drawing conclusions about a large group based on a small, unrepresentative sample is a fallacy."
+            },
+            {
+                statement: "We should believe in life after death because no one has proven it doesn't exist.",
+                options: ["Appeal to Ignorance", "Burden of Proof Error", "Argument from Silence", "Circular Reasoning"],
+                correct: 0,
+                explanation: "This is Appeal to Ignorance. The absence of evidence against something is not evidence for it. The burden of proof lies with the person making the claim."
+            },
+            {
+                statement: "This book must be good because it's been a bestseller for years.",
+                options: ["Bandwagon Fallacy", "Appeal to Authority", "Circular Reasoning", "Ad Hominem"],
+                correct: 0,
+                explanation: "This is a Bandwagon Fallacy. Popularity doesn't determine merit or truth. Many people believing something doesn't make it accurate."
+            },
+            {
+                statement: "If you oppose this tax increase, then you support poverty and suffering.",
+                options: ["Red Herring", "Straw Man", "False Dilemma", "Begging the Question"],
+                correct: 1,
+                explanation: "This is a Straw Man Fallacy. It misrepresents the opposing argument to make it easier to attack, rather than addressing the actual position."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let selectedAnswerIndex = -1;
+
+        const quizContent = document.getElementById('quizContent');
+        const resultsContent = document.getElementById('resultsContent');
+        const progressFill = document.getElementById('progressFill');
+        const progressLabel = document.getElementById('progressLabel');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+
+        // Display question
+        function displayQuestion() {
+            answered = false;
+            selectedAnswerIndex = -1;
+            const question = quizData[currentQuestion];
+
+            let html = `
+                <div class="quiz-content">
+                    <div class="question-number">Question ${currentQuestion + 1} of ${quizData.length}</div>
+                    <div class="statement">"${question.statement}"</div>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <button class="option-btn" onclick="selectAnswer(${index})">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="explanation"></div>
+                    <div class="button-group" id="buttonGroup" style="display: none;">
+                        <button class="btn btn-next" onclick="nextQuestion()">
+                            ${currentQuestion === quizData.length - 1 ? 'See Results' : 'Next Question'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            quizContent.innerHTML = html;
+            updateProgress();
+        }
+
+        // Select answer
+        function selectAnswer(index) {
+            if (answered) return;
+
+            answered = true;
+            selectedAnswerIndex = index;
+            const question = quizData[currentQuestion];
+            const isCorrect = index === question.correct;
+            const buttonGroup = document.getElementById('buttonGroup');
+            const options = document.querySelectorAll('.option-btn');
+
+            if (isCorrect) {
+                score++;
+            }
+
+            options.forEach((btn, btnIndex) => {
+                btn.classList.add('disabled');
+                if (btnIndex === question.correct) {
+                    btn.classList.add('correct');
+                } else if (btnIndex === index && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            // Show explanation
+            const explanationDiv = document.getElementById('explanation');
+            explanationDiv.innerHTML = `
+                <div class="explanation-box">
+                    <div class="explanation-label">${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</div>
+                    <div class="explanation-text">${question.explanation}</div>
+                </div>
+            `;
+
+            buttonGroup.style.display = 'flex';
+            scoreDisplay.textContent = score;
+            updateProgress();
+        }
+
+        // Next question
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Show results
+        function showResults() {
+            quizContent.style.display = 'none';
+            const percentage = (score / quizData.length) * 100;
+            let message = '';
+
+            if (percentage === 100) {
+                message = 'Perfect! You\'re a logic master! 🎓';
+            } else if (percentage >= 80) {
+                message = 'Excellent work! You really know your fallacies! 👏';
+            } else if (percentage >= 60) {
+                message = 'Good job! You understand most logical fallacies. 👍';
+            } else if (percentage >= 40) {
+                message = 'Not bad! Keep learning about logical fallacies. 📚';
+            } else {
+                message = 'Keep studying! Logic is a great skill to develop. 💪';
+            }
+
+            resultsContent.innerHTML = `
+                <div class="results-screen">
+                    <h2 class="results-title">Quiz Complete!</h2>
+                    <div class="score-display">${score}/${quizData.length}</div>
+                    <div class="score-text">${percentage.toFixed(0)}%</div>
+                    <div class="results-message">${message}</div>
+                    <div class="stats-grid">
+                        <div class="stat-card correct">
+                            <div class="stat-number">${score}</div>
+                            <div class="stat-label">Correct</div>
+                        </div>
+                        <div class="stat-card incorrect">
+                            <div class="stat-number">${quizData.length - score}</div>
+                            <div class="stat-label">Incorrect</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-restart" onclick="restartQuiz()">Restart Quiz</button>
+                    </div>
+                </div>
+            `;
+            resultsContent.style.display = 'block';
+            progressFill.style.width = '100%';
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            selectedAnswerIndex = -1;
+            quizContent.style.display = 'block';
+            resultsContent.style.display = 'none';
+            displayQuestion();
+        }
+
+        // Update progress
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
+            progressFill.style.width = progress + '%';
+            progressLabel.textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+        }
+
+        // Initialize
+        displayQuestion();
+    </script>
+</body>
+</html>

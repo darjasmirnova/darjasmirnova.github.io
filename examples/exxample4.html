@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Countdown</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #0a0e27;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 200, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 150, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 200, 0.05) 25%, rgba(0, 255, 200, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 200, 0.05) 75%, rgba(0, 255, 200, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 200, 0.05) 25%, rgba(0, 255, 200, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 200, 0.05) 75%, rgba(0, 255, 200, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            pointer-events: none;
+            animation: gridMove 20s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(50px);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            width: 100%;
+            background: rgba(10, 14, 39, 0.85);
+            border: 2px solid #00ffc8;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 200, 0.3),
+                inset 0 0 30px rgba(0, 255, 200, 0.05),
+                0 0 60px rgba(255, 0, 150, 0.1);
+            animation: containerGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes containerGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 200, 0.3),
+                    inset 0 0 30px rgba(0, 255, 200, 0.05),
+                    0 0 60px rgba(255, 0, 150, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 50px rgba(0, 255, 200, 0.5),
+                    inset 0 0 30px rgba(0, 255, 200, 0.1),
+                    0 0 80px rgba(255, 0, 150, 0.2);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-family: 'Audiowide', cursive;
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(120deg, #00ffc8 0%, #ff00ff 50%, #00ffc8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: glitch 0.3s infinite;
+            text-shadow: 0 0 30px rgba(0, 255, 200, 0.5);
+        }
+
+        @keyframes glitch {
+            0%, 100% {
+                text-shadow: 
+                    2px 0 #00ffc8,
+                    -2px 0 #ff00ff,
+                    0 0 30px rgba(0, 255, 200, 0.5);
+                transform: translate(0);
+            }
+            20% {
+                text-shadow: 
+                    2px 0 #00ffc8,
+                    -2px 0 #ff00ff,
+                    0 0 30px rgba(0, 255, 200, 0.5);
+                transform: translate(-2px, -2px);
+            }
+            40% {
+                text-shadow: 
+                    2px 0 #00ffc8,
+                    -2px 0 #ff00ff,
+                    0 0 30px rgba(0, 255, 200, 0.5);
+                transform: translate(2px, 2px);
+            }
+            60% {
+                text-shadow: 
+                    2px 0 #00ffc8,
+                    -2px 0 #ff00ff,
+                    0 0 30px rgba(0, 255, 200, 0.5);
+                transform: translate(-1px, 1px);
+            }
+            80% {
+                text-shadow: 
+                    2px 0 #00ffc8,
+                    -2px 0 #ff00ff,
+                    0 0 30px rgba(0, 255, 200, 0.5);
+                transform: translate(1px, -1px);
+            }
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #00ffc8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .input-section {
+            background: rgba(0, 255, 200, 0.05);
+            border: 2px solid rgba(0, 255, 200, 0.3);
+            border-radius: 28px;
+            padding: 25px;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #00ffc8;
+            font-weight: 700;
+        }
+
+        input[type="datetime-local"] {
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 200, 0.3);
+            border-radius: 24px;
+            color: #00ffc8;
+            font-family: 'Orbitron', monospace;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 150, 0.5);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        input[type="datetime-local"]::placeholder {
+            color: rgba(0, 255, 200, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: rgba(0, 102, 204, 0.1);
+            border: 2px solid #0066cc;
+            color: #0099ff;
+            border-radius: 24px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 153, 255, 0.2);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            border-color: #0099ff;
+            color: #00d9ff;
+            box-shadow: 0 0 20px rgba(0, 153, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .countdown-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            min-height: 250px;
+            align-items: center;
+        }
+
+        .countdown-unit {
+            background: linear-gradient(135deg, rgba(0, 255, 200, 0.1) 0%, rgba(255, 0, 150, 0.05) 100%);
+            border: 2px solid rgba(0, 255, 200, 0.4);
+            border-radius: 32px;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 20px rgba(0, 255, 200, 0.1),
+                0 0 20px rgba(0, 255, 200, 0.2);
+            animation: unitPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes unitPulse {
+            0%, 100% {
+                box-shadow: 
+                    inset 0 0 20px rgba(0, 255, 200, 0.1),
+                    0 0 20px rgba(0, 255, 200, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 0 30px rgba(0, 255, 200, 0.2),
+                    0 0 30px rgba(0, 255, 200, 0.3);
+            }
+        }
+
+        .countdown-unit:nth-child(2) {
+            animation: unitPulse 1s ease-in-out infinite 0.25s;
+        }
+
+        .countdown-unit:nth-child(3) {
+            animation: unitPulse 1s ease-in-out infinite 0.5s;
+        }
+
+        .countdown-unit:nth-child(4) {
+            animation: unitPulse 1s ease-in-out infinite 0.75s;
+        }
+
+        .countdown-number {
+            font-size: 4em;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(120deg, #00ffc8 0%, #ff00ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .countdown-number::before {
+            content: attr(data-number);
+            position: absolute;
+            left: 0;
+            color: #ff00ff;
+            opacity: 0.3;
+            animation: glitchNumber 0.3s infinite;
+        }
+
+        @keyframes glitchNumber {
+            0% {
+                clip-path: inset(0 0 0 0);
+                transform: translate(0);
+            }
+            20% {
+                clip-path: inset(0 0 65% 0);
+                transform: translate(-2px, -2px);
+            }
+            40% {
+                clip-path: inset(28% 0 35% 0);
+                transform: translate(2px, 2px);
+            }
+            60% {
+                clip-path: inset(44% 0 15% 0);
+                transform: translate(-1px, -1px);
+            }
+            80% {
+                clip-path: inset(75% 0 10% 0);
+                transform: translate(1px, 1px);
+            }
+            100% {
+                clip-path: inset(0 0 0 0);
+                transform: translate(0);
+            }
+        }
+
+        .countdown-label {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffc8;
+            margin-top: 15px;
+            font-weight: 700;
+            opacity: 0.8;
+        }
+
+        .status-message {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 20px;
+            border-radius: 24px;
+            margin-top: 20px;
+            display: none;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.countdown {
+            color: #00ffc8;
+            border: 2px solid rgba(0, 255, 200, 0.5);
+            background: rgba(0, 255, 200, 0.1);
+        }
+
+        .status-message.finished {
+            color: #ff00ff;
+            border: 2px solid rgba(255, 0, 150, 0.5);
+            background: rgba(255, 0, 150, 0.1);
+        }
+
+        .status-message.error {
+            color: #ff0066;
+            border: 2px solid rgba(255, 0, 102, 0.5);
+            background: rgba(255, 0, 102, 0.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .info-section {
+            text-align: center;
+            padding: 20px;
+            color: rgba(0, 255, 200, 0.6);
+            font-size: 0.95em;
+            line-height: 1.6;
+            border-top: 1px solid rgba(0, 255, 200, 0.2);
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .countdown-number {
+                font-size: 2.5em;
+                min-height: 60px;
+            }
+
+            .input-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .button-group {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+            }
+
+            .countdown-display {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">⏱ COUNTDOWN</h1>
+            <p class="subtitle">INITIALIZE TEMPORAL SEQUENCE</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label class="input-label">Target Date & Time</label>
+                <input 
+                    type="datetime-local" 
+                    id="targetDate"
+                    placeholder="Select target date and time"
+                >
+            </div>
+            <div class="button-group">
+                <button class="btn" onclick="setCountdown()">SET TARGET</button>
+                <button class="btn" onclick="resetCountdown()">RESET</button>
+            </div>
+        </div>
+
+        <div class="countdown-display" id="countdownDisplay">
+            <div class="countdown-unit">
+                <div class="countdown-number" id="days" data-number="00">00</div>
+                <div class="countdown-label">Days</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-number" id="hours" data-number="00">00</div>
+                <div class="countdown-label">Hours</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-number" id="minutes" data-number="00">00</div>
+                <div class="countdown-label">Minutes</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-number" id="seconds" data-number="00">00</div>
+                <div class="countdown-label">Seconds</div>
+            </div>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <div class="info-section">
+            <p>⚡ Set a future date to begin countdown | All data persists locally | No connection required</p>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval = null;
+        let targetDateTime = localStorage.getItem('countdownTarget');
+
+        const targetDateInput = document.getElementById('targetDate');
+        const statusMessage = document.getElementById('statusMessage');
+        const countdownDisplay = document.getElementById('countdownDisplay');
+
+        // Initialize
+        function init() {
+            if (targetDateTime) {
+                targetDateInput.value = targetDateTime;
+                startCountdown();
+            }
+        }
+
+        // Set countdown
+        function setCountdown() {
+            const selected = targetDateInput.value;
+            if (!selected) {
+                showStatus('Please select a date and time', 'error');
+                return;
+            }
+
+            const selectedTime = new Date(selected).getTime();
+            const now = new Date().getTime();
+
+            if (selectedTime <= now) {
+                showStatus('Please select a future date and time', 'error');
+                return;
+            }
+
+            targetDateTime = selected;
+            localStorage.setItem('countdownTarget', targetDateTime);
+            startCountdown();
+        }
+
+        // Start countdown
+        function startCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Update countdown
+        function updateCountdown() {
+            const targetTime = new Date(targetDateTime).getTime();
+            const now = new Date().getTime();
+            const distance = targetTime - now;
+
+            if (distance <= 0) {
+                clearInterval(countdownInterval);
+                setCountdownDisplay(0, 0, 0, 0);
+                showStatus('🚀 COUNTDOWN COMPLETE - SEQUENCE INITIATED', 'finished');
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            setCountdownDisplay(days, hours, minutes, seconds);
+            showStatus(`⏳ Time until sequence: ${days}d ${hours}h ${minutes}m ${seconds}s`, 'countdown');
+        }
+
+        // Set countdown display
+        function setCountdownDisplay(days, hours, minutes, seconds) {
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('days').setAttribute('data-number', String(days).padStart(2, '0'));
+            
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('hours').setAttribute('data-number', String(hours).padStart(2, '0'));
+            
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('minutes').setAttribute('data-number', String(minutes).padStart(2, '0'));
+            
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            document.getElementById('seconds').setAttribute('data-number', String(seconds).padStart(2, '0'));
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message show ${type}`;
+        }
+
+        // Reset countdown
+        function resetCountdown() {
+            clearInterval(countdownInterval);
+            targetDateTime = null;
+            localStorage.removeItem('countdownTarget');
+            targetDateInput.value = '';
+            setCountdownDisplay(0, 0, 0, 0);
+            statusMessage.classList.remove('show');
+        }
+
+        // Initialize on load
+        init();
+
+        // Fallback update in case interval needs refresh
+        window.addEventListener('focus', () => {
+            if (targetDateTime && !countdownInterval) {
+                startCountdown();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragging Physics - Laisk Lohistamine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: default;
+            position: relative;
+        }
+
+        /* Info paneel */
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .info-panel h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Statistika paneel */
+        .stats-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 15px;
+        }
+
+        .stats-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Kontrollid */
+        .controls-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            pointer-events: all;
+        }
+
+        button:hover {
+            background: #333;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Lohistatav objekt */
+        .draggable {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease, transform 0.1s ease;
+            z-index: 1;
+        }
+
+        .draggable:hover {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            transform: scale(1.05);
+        }
+
+        .draggable.dragging {
+            cursor: grabbing;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            transform: scale(1.1);
+        }
+
+        /* Jälje efekt */
+        .trail {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Infokast objekti kohta */
+        .object-info {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 101;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Seinad */
+        .wall-indicator {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .wall-indicator.top { top: 0; left: 0; right: 0; height: 2px; }
+        .wall-indicator.bottom { bottom: 0; left: 0; right: 0; height: 2px; }
+        .wall-indicator.left { top: 0; bottom: 0; left: 0; width: 2px; }
+        .wall-indicator.right { top: 0; bottom: 0; right: 0; width: 2px; }
+
+        .wall-indicator.flash {
+            background: rgba(255, 255, 255, 0.8);
+            animation: wallFlash 0.3s ease-out;
+        }
+
+        @keyframes wallFlash {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="info-panel">
+        <h1>🎯 Dragging Physics</h1>
+        <p>Lohistage objekte ja tundke nende raskust!</p>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stats-item">
+            <span class="stats-label">Objekte:</span>
+            <span class="stats-value" id="objectCount">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Kiirus:</span>
+            <span class="stats-value" id="velocity">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Põrkeid:</span>
+            <span class="stats-value" id="bounceCount">0</span>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <button id="addBtn">➕ Lisa objekt</button>
+        <button id="resetBtn">🔄 Lähtesta</button>
+        <button id="physicsBtn">⚙️ Füüsika: Keskmine</button>
+        <button id="trailBtn">✨ Jäljed: Sees</button>
+    </div>
+
+    <!-- Seinad -->
+    <div class="wall-indicator top"></div>
+    <div class="wall-indicator bottom"></div>
+    <div class="wall-indicator left"></div>
+    <div class="wall-indicator right"></div>
+
+    <script>
+        const objectCountEl = document.getElementById('objectCount');
+        const velocityEl = document.getElementById('velocity');
+        const bounceCountEl = document.getElementById('bounceCount');
+        const addBtn = document.getElementById('addBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const physicsBtn = document.getElementById('physicsBtn');
+        const trailBtn = document.getElementById('trailBtn');
+
+        // Objektide loend
+        let objects = [];
+        let draggedObject = null;
+        let mouseX = 0;
+        let mouseY = 0;
+        let bounceCount = 0;
+        let trailEnabled = true;
+
+        // Füüsika seaded
+        let physicsSettings = {
+            damping: 0.15,      // Takistus (mida suurem, seda aeglasem)
+            springStrength: 0.1, // Vedru jõud (kui kiirelt järgneb)
+            bounce: 0.6,        // Põrke elastsus
+            friction: 0.98      // Hõõrdumine
+        };
+
+        const physicsPresets = [
+            { name: 'Kerge', damping: 0.08, springStrength: 0.15, bounce: 0.7, friction: 0.99 },
+            { name: 'Keskmine', damping: 0.15, springStrength: 0.1, bounce: 0.6, friction: 0.98 },
+            { name: 'Raske', damping: 0.25, springStrength: 0.06, bounce: 0.4, friction: 0.95 }
+        ];
+        let currentPreset = 1;
+
+        // Emoji loend
+        const emojis = ['🎯', '⚽', '🏀', '🎱', '🎾', '🏐', '⚾', '🎳', '🥎', '🏉', 
+                        '🎮', '🎲', '🧩', '🎪', '🎨', '🎭', '🎬', '🎤', '🎧', '🎸'];
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', 
+                        '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B500', '#52B788'];
+
+        // Objekti klass
+        class DraggableObject {
+            constructor(x, y, emoji, color) {
+                this.x = x;
+                this.y = y;
+                this.targetX = x;
+                this.targetY = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.radius = 40;
+                this.emoji = emoji;
+                this.color = color;
+                this.isDragging = false;
+                this.element = null;
+                this.info = null;
+                this.trails = [];
+                
+                this.createElement();
+                this.attachEvents();
+            }
+
+            createElement() {
+                this.element = document.createElement('div');
+                this.element.className = 'draggable';
+                this.element.style.background = this.color;
+                this.element.textContent = this.emoji;
+                this.element.style.left = this.x + 'px';
+                this.element.style.top = this.y + 'px';
+                document.body.appendChild(this.element);
+
+                this.info = document.createElement('div');
+                this.info.className = 'object-info';
+                this.info.style.display = 'none';
+                document.body.appendChild(this.info);
+            }
+
+            attachEvents() {
+                this.element.addEventListener('mousedown', (e) => {
+                    this.isDragging = true;
+                    draggedObject = this;
+                    this.element.classList.add('dragging');
+                    this.vx = 0;
+                    this.vy = 0;
+                    e.preventDefault();
+                });
+            }
+
+            update() {
+                if (this.isDragging) {
+                    // Lohistamisel järgib hiirt lagiga
+                    this.targetX = mouseX - this.radius;
+                    this.targetY = mouseY - this.radius;
+                } else {
+                    // Vaba liikumine inertsiaga
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Hõõrdumine
+                    this.vx *= physicsSettings.friction;
+                    this.vy *= physicsSettings.friction;
+
+                    // Põrked seintega
+                    if (this.x < 0) {
+                        this.x = 0;
+                        this.vx = -this.vx * physicsSettings.bounce;
+                        this.flashWall('left');
+                    }
+                    if (this.x + this.radius * 2 > window.innerWidth) {
+                        this.x = window.innerWidth - this.radius * 2;
+                        this.vx = -this.vx * physicsSettings.bounce;
+                        this.flashWall('right');
+                    }
+                    if (this.y < 0) {
+                        this.y = 0;
+                        this.vy = -this.vy * physicsSettings.bounce;
+                        this.flashWall('top');
+                    }
+                    if (this.y + this.radius * 2 > window.innerHeight) {
+                        this.y = window.innerHeight - this.radius * 2;
+                        this.vy = -this.vy * physicsSettings.bounce;
+                        this.flashWall('bottom');
+                    }
+
+                    this.targetX = this.x;
+                    this.targetY = this.y;
+                }
+
+                // Vedruefekt - objekt järgneb target positsiooni laggiga
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+
+                // Kiirenda objekti target'i suunas
+                this.vx += dx * physicsSettings.springStrength;
+                this.vy += dy * physicsSettings.springStrength;
+
+                // Rakenda takistust
+                this.vx *= (1 - physicsSettings.damping);
+                this.vy *= (1 - physicsSettings.damping);
+
+                // Uuenda positsiooni
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Uuenda DOM elementi
+                this.element.style.left = this.x + 'px';
+                this.element.style.top = this.y + 'px';
+
+                // Jäljed
+                if (trailEnabled && (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5)) {
+                    this.addTrail();
+                }
+
+                // Info
+                if (this.isDragging) {
+                    const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    this.info.textContent = `v: ${speed.toFixed(1)} px/s`;
+                    this.info.style.left = (this.x + this.radius * 2 + 10) + 'px';
+                    this.info.style.top = (this.y + this.radius) + 'px';
+                    this.info.style.display = 'block';
+                    
+                    velocityEl.textContent = speed.toFixed(1);
+                } else {
+                    this.info.style.display = 'none';
+                }
+            }
+
+            addTrail() {
+                const trail = document.createElement('div');
+                trail.className = 'trail';
+                trail.style.left = (this.x + this.radius) + 'px';
+                trail.style.top = (this.y + this.radius) + 'px';
+                trail.style.width = this.radius + 'px';
+                trail.style.height = this.radius + 'px';
+                trail.style.background = this.color;
+                trail.style.opacity = '0.3';
+                document.body.appendChild(trail);
+
+                setTimeout(() => {
+                    trail.style.transition = 'all 0.5s ease-out';
+                    trail.style.opacity = '0';
+                    trail.style.transform = 'scale(0.5)';
+                }, 10);
+
+                setTimeout(() => {
+                    trail.remove();
+                }, 500);
+            }
+
+            flashWall(side) {
+                const wall = document.querySelector(`.wall-indicator.${side}`);
+                wall.classList.remove('flash');
+                void wall.offsetWidth; // Force reflow
+                wall.classList.add('flash');
+                bounceCount++;
+            }
+
+            release() {
+                this.isDragging = false;
+                this.element.classList.remove('dragging');
+                this.info.style.display = 'none';
+            }
+
+            remove() {
+                this.element.remove();
+                this.info.remove();
+            }
+        }
+
+        // Lisa objekt
+        function addObject() {
+            const x = Math.random() * (window.innerWidth - 80);
+            const y = Math.random() * (window.innerHeight - 80);
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const obj = new DraggableObject(x, y, emoji, color);
+            objects.push(obj);
+            updateStats();
+        }
+
+        // Lähtesta
+        function reset() {
+            objects.forEach(obj => obj.remove());
+            objects = [];
+            bounceCount = 0;
+            updateStats();
+            
+            // Lisa mõned algused objektid
+            for (let i = 0; i < 5; i++) {
+                addObject();
+            }
+        }
+
+        // Uuenda statistikat
+        function updateStats() {
+            objectCountEl.textContent = objects.length;
+            bounceCountEl.textContent = bounceCount;
+        }
+
+        // Hiire sündmused
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (draggedObject) {
+                draggedObject.release();
+                draggedObject = null;
+            }
+        });
+
+        // Nupud
+        addBtn.addEventListener('click', addObject);
+        resetBtn.addEventListener('click', reset);
+
+        physicsBtn.addEventListener('click', () => {
+            currentPreset = (currentPreset + 1) % physicsPresets.length;
+            const preset = physicsPresets[currentPreset];
+            physicsSettings.damping = preset.damping;
+            physicsSettings.springStrength = preset.springStrength;
+            physicsSettings.bounce = preset.bounce;
+            physicsSettings.friction = preset.friction;
+            physicsBtn.textContent = `⚙️ Füüsika: ${preset.name}`;
+        });
+
+        trailBtn.addEventListener('click', () => {
+            trailEnabled = !trailEnabled;
+            trailBtn.textContent = trailEnabled ? '✨ Jäljed: Sees' : '✨ Jäljed: Väljas';
+        });
+
+        // Animatsiooni tsükkel
+        function animate() {
+            objects.forEach(obj => obj.update());
+            requestAnimationFrame(animate);
+        }
+
+        // Klaviatuuri kiirklahvid
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'a' || e.key === 'A') {
+                addObject();
+            } else if (e.key === 'r' || e.key === 'R') {
+                reset();
+            } else if (e.key === 'p' || e.key === 'P') {
+                physicsBtn.click();
+            } else if (e.key === 't' || e.key === 'T') {
+                trailBtn.click();
+            }
+        });
+
+        // Alusta
+        reset();
+        animate();
+    </script>
+</body>
+</html>

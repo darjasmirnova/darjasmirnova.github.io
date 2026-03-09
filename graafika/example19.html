@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key-Sound Piano - Helide Klahvistik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        /* Visual keyboard display */
+        .keyboard-display {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            min-width: 600px;
+            max-width: 800px;
+        }
+
+        .typed-text {
+            min-height: 60px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            font-size: 32px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            text-align: center;
+            word-wrap: break-word;
+            margin-bottom: 20px;
+        }
+
+        .last-key {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .last-key strong {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        /* Visual key press animation */
+        .key-animation {
+            position: fixed;
+            pointer-events: none;
+            font-size: 80px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            animation: keyPop 0.6s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes keyPop {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -80%) scale(1);
+            }
+        }
+
+        /* Sound wave visualization */
+        .sound-wave {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .wave-bar {
+            width: 8px;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: height 0.1s ease;
+        }
+
+        /* Control panel */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            min-width: 600px;
+            max-width: 800px;
+        }
+
+        .control-panel h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sound-modes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .mode-btn {
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .mode-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .mode-emoji {
+            font-size: 30px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .control-value {
+            float: right;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .stats {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        button {
+            width: 100%;
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎹 Key-Sound Piano</h1>
+        <p>Hakka tippima ja kuula muusikat!</p>
+    </div>
+
+    <div class="keyboard-display">
+        <div class="sound-wave" id="soundWave"></div>
+        <div class="typed-text" id="typedText">Alusta tippimist...</div>
+        <div class="last-key">
+            Viimane klahv: <strong id="lastKey">-</strong> | 
+            Heli: <strong id="lastSound">-</strong>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <h3>🎵 Helirežiimid</h3>
+        
+        <div class="sound-modes">
+            <div class="mode-btn active" data-mode="random">
+                <span class="mode-emoji">🎲</span>
+                Juhuslik
+            </div>
+            <div class="mode-btn" data-mode="beeps">
+                <span class="mode-emoji">🔊</span>
+                Biibid
+            </div>
+            <div class="mode-btn" data-mode="bloops">
+                <span class="mode-emoji">💧</span>
+                Bloobid
+            </div>
+            <div class="mode-btn" data-mode="pings">
+                <span class="mode-emoji">🔔</span>
+                Pingid
+            </div>
+            <div class="mode-btn" data-mode="cartoon">
+                <span class="mode-emoji">🎪</span>
+                Multikas
+            </div>
+            <div class="mode-btn" data-mode="piano">
+                <span class="mode-emoji">🎹</span>
+                Klaver
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-value" id="keyCount">0</span>
+                <span class="stat-label">Klahvivajutust</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="soundCount">0</span>
+                <span class="stat-label">Heli mängitud</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="currentMode">Juhuslik</span>
+                <span class="stat-label">Režiim</span>
+            </div>
+        </div>
+
+        <div class="controls-grid">
+            <div class="control-group">
+                <label>
+                    Helitugevus
+                    <span class="control-value" id="volumeValue">70%</span>
+                </label>
+                <input type="range" id="volumeSlider" min="0" max="100" value="70">
+            </div>
+            <div class="control-group">
+                <label>
+                    Heli kestus
+                    <span class="control-value" id="durationValue">150ms</span>
+                </label>
+                <input type="range" id="durationSlider" min="50" max="500" value="150">
+            </div>
+        </div>
+
+        <button id="clearBtn">🗑️ Tühjenda tekst</button>
+    </div>
+
+    <script>
+        // Audio context
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const typedText = document.getElementById('typedText');
+        const lastKey = document.getElementById('lastKey');
+        const lastSound = document.getElementById('lastSound');
+        const soundWave = document.getElementById('soundWave');
+        const keyCountEl = document.getElementById('keyCount');
+        const soundCountEl = document.getElementById('soundCount');
+        const currentModeEl = document.getElementById('currentMode');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const durationSlider = document.getElementById('durationSlider');
+        const durationValue = document.getElementById('durationValue');
+        const clearBtn = document.getElementById('clearBtn');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+
+        let keyCount = 0;
+        let soundCount = 0;
+        let currentMode = 'random';
+        let volume = 0.7;
+        let duration = 150;
+        let text = '';
+
+        // Create wave bars
+        for (let i = 0; i < 20; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            bar.style.height = '20px';
+            soundWave.appendChild(bar);
+        }
+        const waveBars = document.querySelectorAll('.wave-bar');
+
+        // Sound types
+        const soundTypes = {
+            beeps: [
+                { name: 'Beep', freq: 440, type: 'sine' },
+                { name: 'High Beep', freq: 880, type: 'sine' },
+                { name: 'Low Beep', freq: 220, type: 'sine' },
+                { name: 'Mid Beep', freq: 550, type: 'sine' }
+            ],
+            bloops: [
+                { name: 'Bloop', freq: 200, type: 'sine', slide: 100 },
+                { name: 'Deep Bloop', freq: 150, type: 'sine', slide: 80 },
+                { name: 'High Bloop', freq: 400, type: 'sine', slide: 200 },
+                { name: 'Quick Bloop', freq: 300, type: 'sine', slide: 150 }
+            ],
+            pings: [
+                { name: 'Ping', freq: 1000, type: 'sine' },
+                { name: 'Ding', freq: 1200, type: 'triangle' },
+                { name: 'Ting', freq: 1500, type: 'sine' },
+                { name: 'Bell', freq: 800, type: 'triangle' }
+            ],
+            cartoon: [
+                { name: 'Piu', freq: 600, type: 'square', slide: 1200 },
+                { name: 'Pow', freq: 150, type: 'sawtooth', slide: 50 },
+                { name: 'Boing', freq: 200, type: 'sine', slide: 600 },
+                { name: 'Zap', freq: 2000, type: 'square', slide: 100 }
+            ],
+            piano: [
+                { name: 'C', freq: 261.63, type: 'sine' },
+                { name: 'D', freq: 293.66, type: 'sine' },
+                { name: 'E', freq: 329.63, type: 'sine' },
+                { name: 'F', freq: 349.23, type: 'sine' },
+                { name: 'G', freq: 392.00, type: 'sine' },
+                { name: 'A', freq: 440.00, type: 'sine' },
+                { name: 'B', freq: 493.88, type: 'sine' }
+            ]
+        };
+
+        // Play sound
+        function playSound(soundConfig) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = soundConfig.type;
+            oscillator.frequency.setValueAtTime(soundConfig.freq, audioContext.currentTime);
+            
+            // Slide effect
+            if (soundConfig.slide) {
+                oscillator.frequency.exponentialRampToValueAtTime(
+                    soundConfig.slide, 
+                    audioContext.currentTime + duration / 1000
+                );
+            }
+            
+            // Volume envelope
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+            
+            return soundConfig.name;
+        }
+
+        // Get random sound
+        function getRandomSound() {
+            const modes = Object.keys(soundTypes);
+            const randomMode = modes[Math.floor(Math.random() * modes.length)];
+            const sounds = soundTypes[randomMode];
+            return sounds[Math.floor(Math.random() * sounds.length)];
+        }
+
+        // Animate wave
+        function animateWave() {
+            waveBars.forEach((bar, index) => {
+                const height = Math.random() * 80 + 20;
+                setTimeout(() => {
+                    bar.style.height = height + 'px';
+                    setTimeout(() => {
+                        bar.style.height = '20px';
+                    }, 100);
+                }, index * 10);
+            });
+        }
+
+        // Create key animation
+        function createKeyAnimation(key) {
+            const animation = document.createElement('div');
+            animation.className = 'key-animation';
+            animation.textContent = key;
+            animation.style.left = Math.random() * window.innerWidth + 'px';
+            animation.style.top = Math.random() * window.innerHeight + 'px';
+            document.body.appendChild(animation);
+            
+            setTimeout(() => {
+                animation.remove();
+            }, 600);
+        }
+
+        // Key press handler
+        document.addEventListener('keydown', (e) => {
+            // Ignore special keys
+            if (e.key.length > 1 && e.key !== 'Enter' && e.key !== 'Backspace') return;
+            
+            e.preventDefault();
+            
+            // Handle backspace
+            if (e.key === 'Backspace') {
+                text = text.slice(0, -1);
+                typedText.textContent = text || 'Alusta tippimist...';
+                return;
+            }
+            
+            // Handle enter
+            if (e.key === 'Enter') {
+                text += '\n';
+                typedText.textContent = text;
+                return;
+            }
+            
+            // Get sound
+            let soundConfig;
+            if (currentMode === 'random') {
+                soundConfig = getRandomSound();
+            } else {
+                const sounds = soundTypes[currentMode];
+                soundConfig = sounds[Math.floor(Math.random() * sounds.length)];
+            }
+            
+            // Play sound
+            const soundName = playSound(soundConfig);
+            
+            // Update display
+            text += e.key;
+            typedText.textContent = text;
+            lastKey.textContent = e.key;
+            lastSound.textContent = soundName;
+            
+            // Animate
+            animateWave();
+            createKeyAnimation(e.key);
+            
+            // Update stats
+            keyCount++;
+            soundCount++;
+            keyCountEl.textContent = keyCount;
+            soundCountEl.textContent = soundCount;
+        });
+
+        // Mode selection
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+                
+                const modeNames = {
+                    random: 'Juhuslik',
+                    beeps: 'Biibid',
+                    bloops: 'Bloobid',
+                    pings: 'Pingid',
+                    cartoon: 'Multikas',
+                    piano: 'Klaver'
+                };
+                currentModeEl.textContent = modeNames[currentMode];
+            });
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            volume = parseInt(e.target.value) / 100;
+            volumeValue.textContent = e.target.value + '%';
+        });
+
+        // Duration control
+        durationSlider.addEventListener('input', (e) => {
+            duration = parseInt(e.target.value);
+            durationValue.textContent = duration + 'ms';
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            text = '';
+            typedText.textContent = 'Alusta tippimist...';
+            keyCount = 0;
+            soundCount = 0;
+            keyCountEl.textContent = '0';
+            soundCountEl.textContent = '0';
+            lastKey.textContent = '-';
+            lastSound.textContent = '-';
+        });
+
+        // Initialize audio context on first interaction
+        document.addEventListener('click', () => {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover-Glitch Effect</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .image-container {
+            display: inline-block;
+            margin: 20px;
+        }
+        img {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #000;
+            transition: filter 0.3s;
+        }
+        img:hover {
+            animation: glitch 0.3s infinite;
+            filter: hue-rotate(90deg) saturate(2);
+        }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Hover over the images for glitch effect</h1>
+    <div class="image-container">
+        <img src="https://tse2.mm.bing.net/th/id/OIP.NipQRyLklLWikwofJwGOCgHaF8?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Image 1">
+    </div>
+    
+</body>
+</html>

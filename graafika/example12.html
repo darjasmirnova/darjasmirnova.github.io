@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Splash - Värvikas Plahvatus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: crosshair;
+            position: relative;
+        }
+
+        /* Canvas taust */
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Info paneel */
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-panel h1 {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .info-panel p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+        }
+
+        /* Statistika paneel */
+        .stats-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 20px;
+        }
+
+        .stats-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .stats-value {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Kontrollid */
+        .controls-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            pointer-events: all;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Aktiveerimine nupu hoidmise ajal */
+        .holding-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .holding-indicator.active {
+            opacity: 1;
+        }
+
+        /* Värvide palett */
+        .color-palette {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .color-palette h3 {
+            font-size: 14px;
+            color: white;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .color-option {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            pointer-events: all;
+        }
+
+        .color-option:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 20px currentColor;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div class="info-panel">
+        <h1>💥 Color Splash</h1>
+        <p>Hoidke hiirenupp all ja laske värvidel kasvada!</p>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stats-item">
+            <span class="stats-label">Plahvatusi:</span>
+            <span class="stats-value" id="splashCount">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Max suurus:</span>
+            <span class="stats-value" id="maxSize">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Aktiivseid:</span>
+            <span class="stats-value" id="activeCount">0</span>
+        </div>
+    </div>
+
+    <div class="color-palette">
+        <h3>Vali värv:</h3>
+        <div class="color-options">
+            <div class="color-option selected" data-color="#FF6B6B" style="background: #FF6B6B;"></div>
+            <div class="color-option" data-color="#4ECDC4" style="background: #4ECDC4;"></div>
+            <div class="color-option" data-color="#45B7D1" style="background: #45B7D1;"></div>
+            <div class="color-option" data-color="#FFA07A" style="background: #FFA07A;"></div>
+            <div class="color-option" data-color="#98D8C8" style="background: #98D8C8;"></div>
+            <div class="color-option" data-color="#F7DC6F" style="background: #F7DC6F;"></div>
+            <div class="color-option" data-color="#BB8FCE" style="background: #BB8FCE;"></div>
+            <div class="color-option" data-color="#85C1E2" style="background: #85C1E2;"></div>
+            <div class="color-option" data-color="#F8B500" style="background: #F8B500;"></div>
+            <div class="color-option" data-color="#52B788" style="background: #52B788;"></div>
+            <div class="color-option" data-color="#FF6392" style="background: #FF6392;"></div>
+            <div class="color-option" data-color="#A8DADC" style="background: #A8DADC;"></div>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <button id="clearBtn">🗑️ Tühjenda</button>
+        <button id="modeBtn">🎨 Režiim: Üks värv</button>
+        <button id="fadeBtn">⏱️ Hajumine: Sees</button>
+    </div>
+
+    <div class="holding-indicator" id="holdingIndicator">Hoia all...</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const splashCountEl = document.getElementById('splashCount');
+        const maxSizeEl = document.getElementById('maxSize');
+        const activeCountEl = document.getElementById('activeCount');
+        const clearBtn = document.getElementById('clearBtn');
+        const modeBtn = document.getElementById('modeBtn');
+        const fadeBtn = document.getElementById('fadeBtn');
+        const holdingIndicator = document.getElementById('holdingIndicator');
+        const colorOptions = document.querySelectorAll('.color-option');
+
+        // Canvas suuruse seadistamine
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Muutujad
+        let splashes = [];
+        let currentSplash = null;
+        let isMouseDown = false;
+        let selectedColor = '#FF6B6B';
+        let rainbowMode = false;
+        let fadeEnabled = true;
+        let splashCount = 0;
+        let maxSize = 0;
+        let animationId;
+
+        // Värvi valik
+        colorOptions.forEach(option => {
+            option.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+            });
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                colorOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedColor = option.dataset.color;
+                rainbowMode = false;
+                modeBtn.textContent = '🎨 Režiim: Üks värv';
+            });
+        });
+
+        // Režiimi valik
+        modeBtn.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+        modeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            rainbowMode = !rainbowMode;
+            if (rainbowMode) {
+                modeBtn.textContent = '🎨 Režiim: Vikerkaar';
+                colorOptions.forEach(opt => opt.classList.remove('selected'));
+            } else {
+                modeBtn.textContent = '🎨 Režiim: Üks värv';
+            }
+        });
+
+        // Hajumise valik
+        fadeBtn.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+        fadeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fadeEnabled = !fadeEnabled;
+            fadeBtn.textContent = fadeEnabled ? '⏱️ Hajumine: Sees' : '⏱️ Hajumine: Väljas';
+        });
+
+        // Tühjenda
+        clearBtn.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+        clearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            splashes = [];
+            currentSplash = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        // Hiire sündmused
+        canvas.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            holdingIndicator.classList.add('active');
+            
+            const color = rainbowMode ? getRandomColor() : selectedColor;
+            
+            currentSplash = {
+                x: e.clientX,
+                y: e.clientY,
+                radius: 0,
+                maxRadius: 300,
+                growthRate: 2,
+                color: color,
+                alpha: 0.6,
+                particles: []
+            };
+            
+            splashes.push(currentSplash);
+            splashCount++;
+            updateStats();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isMouseDown = false;
+            holdingIndicator.classList.remove('active');
+            
+            if (currentSplash && currentSplash.radius > maxSize) {
+                maxSize = Math.round(currentSplash.radius);
+            }
+            
+            currentSplash = null;
+            updateStats();
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isMouseDown = false;
+            holdingIndicator.classList.remove('active');
+            currentSplash = null;
+        });
+
+        // Juhuslik värv
+        function getRandomColor() {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+                '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+                '#F8B500', '#52B788', '#FF6392', '#A8DADC'
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Statistika uuendamine
+        function updateStats() {
+            splashCountEl.textContent = splashCount;
+            maxSizeEl.textContent = maxSize;
+            activeCountEl.textContent = splashes.filter(s => s.alpha > 0).length;
+        }
+
+        // Animatsiooni tsükkel
+        function animate() {
+            // Poolläbipaistev taust hajumise efektiks
+            if (fadeEnabled) {
+                ctx.fillStyle = 'rgba(26, 26, 26, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Joonista kõik plahvatused
+            splashes.forEach((splash, index) => {
+                // Kasva plahvatust, kui hiir on all
+                if (splash === currentSplash && isMouseDown) {
+                    splash.radius += splash.growthRate;
+                    splash.growthRate *= 1.02; // Kiirenda kasvu
+                    
+                    if (splash.radius > splash.maxRadius) {
+                        splash.radius = splash.maxRadius;
+                    }
+
+                    // Lisa osakesi
+                    if (Math.random() < 0.3) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 2 + 1;
+                        splash.particles.push({
+                            x: splash.x,
+                            y: splash.y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            size: Math.random() * 3 + 1,
+                            alpha: 1
+                        });
+                    }
+                } else if (fadeEnabled) {
+                    // Hajuta aeglaselt
+                    splash.alpha -= 0.003;
+                }
+
+                // Joonista põhiring
+                if (splash.alpha > 0) {
+                    // Välisring (helendus)
+                    const gradient = ctx.createRadialGradient(
+                        splash.x, splash.y, 0,
+                        splash.x, splash.y, splash.radius
+                    );
+                    gradient.addColorStop(0, splash.color + Math.floor(splash.alpha * 100).toString(16).padStart(2, '0'));
+                    gradient.addColorStop(0.5, splash.color + Math.floor(splash.alpha * 50).toString(16).padStart(2, '0'));
+                    gradient.addColorStop(1, splash.color + '00');
+
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(splash.x, splash.y, splash.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Sisemine helkiv ring
+                    if (splash === currentSplash && isMouseDown) {
+                        const innerGradient = ctx.createRadialGradient(
+                            splash.x, splash.y, 0,
+                            splash.x, splash.y, splash.radius * 0.3
+                        );
+                        innerGradient.addColorStop(0, '#FFFFFF' + Math.floor(splash.alpha * 200).toString(16).padStart(2, '0'));
+                        innerGradient.addColorStop(1, splash.color + Math.floor(splash.alpha * 100).toString(16).padStart(2, '0'));
+
+                        ctx.fillStyle = innerGradient;
+                        ctx.beginPath();
+                        ctx.arc(splash.x, splash.y, splash.radius * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Joonista osakesed
+                    splash.particles.forEach((particle, pIndex) => {
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        particle.alpha -= 0.02;
+
+                        if (particle.alpha > 0) {
+                            ctx.fillStyle = splash.color + Math.floor(particle.alpha * 255).toString(16).padStart(2, '0');
+                            ctx.beginPath();
+                            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else {
+                            splash.particles.splice(pIndex, 1);
+                        }
+                    });
+                } else {
+                    // Eemalda kadunud plahvatused
+                    splashes.splice(index, 1);
+                }
+            });
+
+            updateStats();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Klaviatuuri kiirklahvid
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'c' || e.key === 'C') {
+                clearBtn.click();
+            } else if (e.key === 'm' || e.key === 'M') {
+                modeBtn.click();
+            } else if (e.key === 'f' || e.key === 'F') {
+                fadeBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

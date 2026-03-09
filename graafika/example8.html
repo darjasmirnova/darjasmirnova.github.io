@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shake to Clear</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+        }
+        
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+        
+        .instruction {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .elements-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .element {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .element:hover {
+            transform: scale(1.05);
+        }
+        
+        .element.falling {
+            animation: fall 1s forwards;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .shake-meter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .shake-meter-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .shake-bar {
+            width: 150px;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .shake-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #FF5722);
+            width: 0;
+            transition: width 0.1s;
+        }
+        
+        .reset-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            background: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            color: #667eea;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .cleared-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .cleared-message.show {
+            animation: showMessage 2s forwards;
+        }
+        
+        @keyframes showMessage {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            10% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            90% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌪️ Shake to Clear 🌪️</h1>
+        <p class="instruction">Move your mouse rapidly left and right to clear all elements!</p>
+        
+        <div class="elements-container" id="elementsContainer">
+            <div class="element" style="background: #FF6B6B;">🎨</div>
+            <div class="element" style="background: #4ECDC4;">🎭</div>
+            <div class="element" style="background: #45B7D1;">🎪</div>
+            <div class="element" style="background: #FFA07A;">🎯</div>
+            <div class="element" style="background: #98D8C8;">🎲</div>
+            <div class="element" style="background: #F7DC6F;">🎸</div>
+            <div class="element" style="background: #BB8FCE;">🎹</div>
+            <div class="element" style="background: #85C1E2;">🎺</div>
+            <div class="element" style="background: #F8B88B;">🎻</div>
+            <div class="element" style="background: #FAD7A0;">🎼</div>
+            <div class="element" style="background: #D7BDE2;">🎧</div>
+            <div class="element" style="background: #A9DFBF;">🎤</div>
+        </div>
+    </div>
+    
+    <div class="shake-meter">
+        <div class="shake-meter-title">Shake Meter</div>
+        <div class="shake-bar">
+            <div class="shake-fill" id="shakeFill"></div>
+        </div>
+    </div>
+    
+    <button class="reset-btn" onclick="resetElements()">🔄 Reset</button>
+    
+    <div class="cleared-message" id="clearedMessage">CLEARED! 🎉</div>
+    
+    <script>
+        let lastX = 0;
+        let lastDirection = 0;
+        let shakeCount = 0;
+        let shakeThreshold = 5; // Number of direction changes needed
+        let lastTime = Date.now();
+        let shakeResetTimeout;
+        
+        document.addEventListener('mousemove', (e) => {
+            const currentX = e.clientX;
+            const currentTime = Date.now();
+            const timeDiff = currentTime - lastTime;
+            
+            // Only count if mouse moved significantly
+            if (Math.abs(currentX - lastX) > 5) {
+                const currentDirection = currentX > lastX ? 1 : -1;
+                
+                // If direction changed and movement is fast enough
+                if (currentDirection !== lastDirection && lastDirection !== 0 && timeDiff < 100) {
+                    shakeCount++;
+                    updateShakeMeter();
+                    
+                    // If shake threshold reached, trigger clear
+                    if (shakeCount >= shakeThreshold) {
+                        clearElements();
+                        shakeCount = 0;
+                        updateShakeMeter();
+                    }
+                }
+                
+                lastDirection = currentDirection;
+                lastX = currentX;
+                lastTime = currentTime;
+            }
+            
+            // Reset shake count after a period of no rapid movement
+            clearTimeout(shakeResetTimeout);
+            shakeResetTimeout = setTimeout(() => {
+                shakeCount = 0;
+                updateShakeMeter();
+            }, 500);
+        });
+        
+        function updateShakeMeter() {
+            const percentage = (shakeCount / shakeThreshold) * 100;
+            document.getElementById('shakeFill').style.width = percentage + '%';
+        }
+        
+        function clearElements() {
+            const elements = document.querySelectorAll('.element');
+            const message = document.getElementById('clearedMessage');
+            
+            // Show cleared message
+            message.classList.add('show');
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 2000);
+            
+            // Make elements fall with slight delays for cascade effect
+            elements.forEach((element, index) => {
+                setTimeout(() => {
+                    element.classList.add('falling');
+                }, index * 50);
+            });
+        }
+        
+        function resetElements() {
+            const container = document.getElementById('elementsContainer');
+            const elements = container.querySelectorAll('.element');
+            
+            // Remove falling elements
+            elements.forEach(el => el.remove());
+            
+            // Recreate elements
+            const emojis = ['🎨', '🎭', '🎪', '🎯', '🎲', '🎸', '🎹', '🎺', '🎻', '🎼', '🎧', '🎤'];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#FAD7A0', '#D7BDE2', '#A9DFBF'];
+            
+            emojis.forEach((emoji, index) => {
+                const element = document.createElement('div');
+                element.className = 'element';
+                element.style.background = colors[index];
+                element.textContent = emoji;
+                container.appendChild(element);
+            });
+            
+            // Reset shake counter
+            shakeCount = 0;
+            updateShakeMeter();
+        }
+    </script>
+</body>
+</html>

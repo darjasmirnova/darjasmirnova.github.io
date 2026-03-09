@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Lifetime Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F8E0EF 0%, #FFDDE8 50%, #F5E6EF 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #000;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(120deg, #FF1493 0%, #FF4D8F 50%, #FFB3D9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #000;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .input-label {
+            display: block;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #000;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px 25px;
+            font-size: 1.3em;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #FF1493;
+            box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .unit-label {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #FFB3D9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.1) 0%, rgba(255, 179, 217, 0.15) 100%);
+            border: 2px solid rgba(255, 20, 147, 0.3);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 20, 147, 0.2);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 20, 147, 0.6);
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.3);
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .result-card:hover::before {
+            left: 100%;
+        }
+
+        .result-value {
+            font-size: 3.5em;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            background: linear-gradient(120deg, #FF1493 0%, #FFB3D9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-label {
+            font-size: 1.1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.95em;
+            color: #000;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .percentage-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.15) 0%, rgba(255, 179, 217, 0.1) 100%);
+            border: 2px solid rgba(255, 20, 147, 0.4);
+        }
+
+        .percentage-card:hover {
+            border-color: rgba(255, 20, 147, 0.7);
+            box-shadow: 0 15px 40px rgba(255, 20, 147, 0.3);
+        }
+
+        .counter {
+            display: inline-block;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .warning-section {
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 20, 147, 0.15);
+            border-left: 4px solid #FF1493;
+            border-radius: 12px;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .warning-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #FF1493;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .warning-text {
+            font-size: 1em;
+            color: #000;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #FF1493;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #000;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .result-value.animate {
+            animation: countUp 0.6s ease-out;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #000;
+            font-size: 1.1em;
+            padding: 40px 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+                letter-spacing: -1px;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .input-section {
+                padding: 25px;
+            }
+
+            .result-card {
+                padding: 25px 15px;
+            }
+
+            .result-value {
+                font-size: 2.5em;
+                min-height: 60px;
+            }
+
+            .result-label {
+                font-size: 1em;
+            }
+
+            .warning-section {
+                padding: 20px;
+            }
+
+            .warning-title {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ Your Wasted Time</h1>
+            <p class="subtitle">See how much of your life social media consumes</p>
+        </div>
+
+        <div class="input-section">
+            <label class="input-label">Daily Social Media Hours</label>
+            <div class="input-wrapper">
+                <input 
+                    type="number" 
+                    id="dailyHours" 
+                    placeholder="Enter hours (e.g., 4.5)" 
+                    min="0" 
+                    max="24" 
+                    step="0.5"
+                    value="3"
+                >
+                <span class="unit-label">hours/day</span>
+            </div>
+        </div>
+
+        <div class="results-grid" id="resultsGrid">
+            <div class="result-card">
+                <div class="result-label">Per Year</div>
+                <div class="result-value">
+                    <span class="counter" id="hoursPerYear">0</span>
+                </div>
+                <div class="result-description">hours per year on social media</div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-label">Days Per Year</div>
+                <div class="result-value">
+                    <span class="counter" id="daysPerYear">0</span>
+                </div>
+                <div class="result-description">full days spent annually</div>
+            </div>
+
+            <div class="result-card percentage-card">
+                <div class="result-label">Waking Life</div>
+                <div class="result-value">
+                    <span class="counter" id="percentageWaking">0</span><span>%</span>
+                </div>
+                <div class="result-description">of your waking hours consumed</div>
+            </div>
+        </div>
+
+        <div class="warning-section" id="warningSection">
+            <div class="warning-title">⚠️ Lifetime Impact</div>
+            <div class="stat-row">
+                <div class="stat-item">
+                    <div class="stat-number" id="yearsOfLife">0</div>
+                    <div class="stat-label">Years (50-year span)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalDays">0</div>
+                    <div class="stat-label">Total Days in Lifetime</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="percentageLifetime">0</div>
+                    <div class="stat-label">% of 50 Years</div>
+                </div>
+            </div>
+            <div class="warning-text" style="margin-top: 20px;">
+                That's equivalent to losing <span id="yearsEquivalent" style="color: #FF1493; font-weight: bold;">0</span> <strong>entire years</strong> of your life to social media scrolling in just 50 years.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dailyHoursInput = document.getElementById('dailyHours');
+        const hoursPerYearEl = document.getElementById('hoursPerYear');
+        const daysPerYearEl = document.getElementById('daysPerYear');
+        const percentageWakingEl = document.getElementById('percentageWaking');
+        const yearsOfLifeEl = document.getElementById('yearsOfLife');
+        const totalDaysEl = document.getElementById('totalDays');
+        const percentageLifetimeEl = document.getElementById('percentageLifetime');
+        const yearsEquivalentEl = document.getElementById('yearsEquivalent');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        // Load saved value
+        function loadSavedValue() {
+            const saved = localStorage.getItem('socialMediaHours');
+            if (saved) {
+                dailyHoursInput.value = saved;
+            }
+        }
+
+        // Animate counter
+        async function animateCounter(element, startValue, endValue, duration = 1000) {
+            const isDecimal = !Number.isInteger(endValue);
+            let current = startValue;
+            const increment = (endValue - startValue) / (duration / 30);
+            
+            return new Promise(resolve => {
+                const interval = setInterval(() => {
+                    current += increment;
+                    if ((increment > 0 && current >= endValue) || (increment < 0 && current <= endValue)) {
+                        current = endValue;
+                        clearInterval(interval);
+                        resolve();
+                    }
+                    element.textContent = isDecimal ? current.toFixed(1) : Math.floor(current);
+                }, 30);
+            });
+        }
+
+        // Calculate and display results
+        async function updateResults() {
+            const dailyHours = parseFloat(dailyHoursInput.value) || 0;
+            
+            // Save value
+            localStorage.setItem('socialMediaHours', dailyHours);
+
+            if (dailyHours === 0) {
+                hoursPerYearEl.textContent = '0';
+                daysPerYearEl.textContent = '0';
+                percentageWakingEl.textContent = '0';
+                yearsOfLifeEl.textContent = '0';
+                totalDaysEl.textContent = '0';
+                percentageLifetimeEl.textContent = '0';
+                yearsEquivalentEl.textContent = '0';
+                return;
+            }
+
+            // Calculations
+            const hoursPerYear = dailyHours * 365;
+            const daysPerYear = hoursPerYear / 24;
+            const wakingHoursPerDay = 16; // Assuming 8 hours sleep
+            const percentageWaking = (dailyHours / wakingHoursPerDay) * 100;
+
+            // 50-year lifetime calculations
+            const lifespan = 50;
+            const totalDaysInLifetime = lifespan * 365;
+            const totalHoursInLifetime = hoursPerYear * lifespan;
+            const yearsEquivalent = totalHoursInLifetime / (wakingHoursPerDay * 365);
+            const percentageOfLifetime = (yearsEquivalent / lifespan) * 100;
+
+            // Animate all counters
+            resultsGrid.querySelectorAll('.result-card').forEach(card => {
+                card.classList.add('animate');
+            });
+
+            await Promise.all([
+                animateCounter(hoursPerYearEl, 0, hoursPerYear, 1000),
+                animateCounter(daysPerYearEl, 0, daysPerYear, 1000),
+                animateCounter(percentageWakingEl, 0, percentageWaking, 1000),
+                animateCounter(yearsOfLifeEl, 0, yearsEquivalent, 1000),
+                animateCounter(totalDaysEl, 0, totalDaysInLifetime, 1000),
+                animateCounter(percentageLifetimeEl, 0, percentageOfLifetime, 1000),
+                animateCounter(yearsEquivalentEl, 0, yearsEquivalent, 1000)
+            ]);
+        }
+
+        // Event listener for input
+        dailyHoursInput.addEventListener('input', updateResults);
+
+        // Initialize
+        loadSavedValue();
+        updateResults();
+    </script>
+</body>
+</html>

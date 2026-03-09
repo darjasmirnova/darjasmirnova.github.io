@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnetic Buttons</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #f0f0f0;
+            position: relative;
+            overflow: hidden;
+        }
+        .button {
+            position: absolute;
+            width: 100px;
+            height: 50px;
+            background: #bb89e9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #9174e2;
+        }
+    </style>
+</head>
+<body>
+    <button class="button" id="btn1">Button 1</button>
+    <button class="button" id="btn2">Button 2</button>
+    <button class="button" id="btn3">Button 3</button>
+    <script>
+        const buttons = [
+            { element: document.getElementById('btn1'), x: 200, y: 200 },
+            { element: document.getElementById('btn2'), x: 400, y: 300 },
+            { element: document.getElementById('btn3'), x: 600, y: 150 }
+        ];
+
+        const magneticRange = 100; // pixels
+        const magneticSpeed = 2; // pixels per frame
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animate() {
+            buttons.forEach(button => {
+                const dx = mouseX - button.x;
+                const dy = mouseY - button.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < magneticRange) {
+                    const moveX = (dx / distance) * magneticSpeed;
+                    const moveY = (dy / distance) * magneticSpeed;
+                    button.x += moveX;
+                    button.y += moveY;
+                }
+
+                button.element.style.transform = `translate(${button.x - 50}px, ${button.y - 25}px)`;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

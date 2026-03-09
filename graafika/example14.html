@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Chaos Rotation - Pöörlevad Elemendid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Pöörlevad elemendid */
+        .rotating-element {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.05s linear;
+            will-change: transform;
+        }
+
+        /* Kaardid */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: white;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Ringid */
+        .circle {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .circle.small {
+            width: 80px;
+            height: 80px;
+            font-size: 30px;
+        }
+
+        .circle.medium {
+            width: 120px;
+            height: 120px;
+            font-size: 50px;
+        }
+
+        .circle.large {
+            width: 160px;
+            height: 160px;
+            font-size: 70px;
+        }
+
+        /* Ikoonid */
+        .icon-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tekst elemendid */
+        .text-element {
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Kontrollpaneel */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            min-width: 280px;
+        }
+
+        .control-panel h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            display: inline-block;
+            float: right;
+            color: #333;
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        button.secondary:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        /* Info badge */
+        .info-badge {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            text-align: center;
+        }
+
+        .info-badge h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .info-badge p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Statistika */
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-badge">
+        <h1>🌀 Auto-Chaos Rotation</h1>
+        <p>Ujuv, elav liides</p>
+    </div>
+
+    <div class="control-panel">
+        <h2>⚙️ Kontrollid</h2>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Elemente:</span>
+                <span class="stat-value" id="elementCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Keskmine kiirus:</span>
+                <span class="stat-value" id="avgSpeed">0</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>
+                Kiiruse kordaja
+                <span class="value-display" id="speedValue">1.0x</span>
+            </label>
+            <input type="range" id="speedSlider" class="slider" min="0" max="30" value="10" step="1">
+        </div>
+
+        <div class="control-group">
+            <label>
+                Kaose tase
+                <span class="value-display" id="chaosValue">50%</span>
+            </label>
+            <input type="range" id="chaosSlider" class="slider" min="0" max="100" value="50" step="5">
+        </div>
+
+        <div class="control-group">
+            <label>
+                Elementide arv
+                <span class="value-display" id="countValue">20</span>
+            </label>
+            <input type="range" id="countSlider" class="slider" min="5" max="50" value="20" step="1">
+        </div>
+
+        <button id="pauseBtn">⏸️ Paus</button>
+        <button id="resetBtn" class="secondary">🔄 Lähtesta</button>
+        <button id="randomizeBtn" class="secondary">🎲 Randomiseeri</button>
+    </div>
+
+    <script>
+        const speedSlider = document.getElementById('speedSlider');
+        const chaosSlider = document.getElementById('chaosSlider');
+        const countSlider = document.getElementById('countSlider');
+        const speedValue = document.getElementById('speedValue');
+        const chaosValue = document.getElementById('chaosValue');
+        const countValue = document.getElementById('countValue');
+        const elementCountEl = document.getElementById('elementCount');
+        const avgSpeedEl = document.getElementById('avgSpeed');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+
+        let elements = [];
+        let isPaused = false;
+        let speedMultiplier = 1.0;
+        let chaosLevel = 50;
+        let targetElementCount = 20;
+        let animationId;
+
+        // Element tüübid
+        const elementTypes = [
+            {
+                type: 'card',
+                create: () => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const titles = ['Roteeriv', 'Pöörelnud', 'Keerlev', 'Ujuv', 'Tiirelnud', 'Ringlus'];
+                    const subtitles = ['Element', 'Kujund', 'Kaart', 'Objekt', 'Komponent'];
+                    card.innerHTML = `
+                        <h3>${titles[Math.floor(Math.random() * titles.length)]}</h3>
+                        <p>${subtitles[Math.floor(Math.random() * subtitles.length)]}</p>
+                    `;
+                    return card;
+                }
+            },
+            {
+                type: 'circle',
+                create: () => {
+                    const circle = document.createElement('div');
+                    const sizes = ['small', 'medium', 'large'];
+                    const size = sizes[Math.floor(Math.random() * sizes.length)];
+                    circle.className = `circle ${size}`;
+                    const emojis = ['⭐', '🌟', '✨', '💫', '🔥', '💎', '🎯', '🎨', '🎭', '🎪', '🎮', '🚀', '🌈', '🦄', '👑'];
+                    circle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+                    circle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    return circle;
+                }
+            },
+            {
+                type: 'icon',
+                create: () => {
+                    const icon = document.createElement('div');
+                    icon.className = 'icon-box';
+                    const icons = ['🎵', '🎸', '🎹', '🎤', '🎧', '🎼', '🎺', '🎻', '🥁', '🎬', '📷', '🎨', '✏️', '🖌️', '🖍️'];
+                    icon.textContent = icons[Math.floor(Math.random() * icons.length)];
+                    return icon;
+                }
+            },
+            {
+                type: 'text',
+                create: () => {
+                    const text = document.createElement('div');
+                    text.className = 'text-element';
+                    const words = ['Pöörlev', 'Keerlev', 'Ujuv', 'Tiirelnud', 'Roteeriv', 'Kaos', 'Liikuv', 'Dünaamiline'];
+                    text.textContent = words[Math.floor(Math.random() * words.length)];
+                    const sizes = [16, 20, 24, 28, 32];
+                    text.style.fontSize = sizes[Math.floor(Math.random() * sizes.length)] + 'px';
+                    return text;
+                }
+            }
+        ];
+
+        // Element objekt
+        class RotatingElement {
+            constructor() {
+                const type = elementTypes[Math.floor(Math.random() * elementTypes.length)];
+                this.element = type.create();
+                this.element.classList.add('rotating-element');
+                
+                // Juhuslik positsioon
+                this.x = Math.random() * (window.innerWidth - 300) + 150;
+                this.y = Math.random() * (window.innerHeight - 300) + 150;
+                this.element.style.left = this.x + 'px';
+                this.element.style.top = this.y + 'px';
+                
+                // Pöörlemise seaded
+                this.rotation = Math.random() * 360;
+                this.baseSpeed = (Math.random() - 0.5) * 2; // -1 kuni 1
+                this.speed = this.baseSpeed;
+                
+                document.body.appendChild(this.element);
+            }
+
+            update() {
+                if (!isPaused) {
+                    // Uuenda kiirust kaose taseme põhjal
+                    const chaos = chaosLevel / 100;
+                    const randomFactor = 1 + (Math.random() - 0.5) * chaos * 0.1;
+                    this.speed = this.baseSpeed * speedMultiplier * randomFactor;
+                    
+                    this.rotation += this.speed;
+                    this.element.style.transform = `rotate(${this.rotation}deg)`;
+                }
+            }
+
+            updatePosition() {
+                // Kontrolli, kas ekraani suurus muutus
+                const maxX = window.innerWidth - 200;
+                const maxY = window.innerHeight - 200;
+                
+                if (this.x > maxX) this.x = maxX;
+                if (this.y > maxY) this.y = maxY;
+                
+                this.element.style.left = this.x + 'px';
+                this.element.style.top = this.y + 'px';
+            }
+
+            remove() {
+                this.element.remove();
+            }
+        }
+
+        // Loo elemendid
+        function createElements(count) {
+            // Eemalda liiga palju elemente
+            while (elements.length > count) {
+                const elem = elements.pop();
+                elem.remove();
+            }
+            
+            // Lisa uusi elemente
+            while (elements.length < count) {
+                elements.push(new RotatingElement());
+            }
+            
+            updateStats();
+        }
+
+        // Uuenda statistikat
+        function updateStats() {
+            elementCountEl.textContent = elements.length;
+            const totalSpeed = elements.reduce((sum, elem) => sum + Math.abs(elem.speed), 0);
+            const avg = elements.length > 0 ? (totalSpeed / elements.length).toFixed(2) : 0;
+            avgSpeedEl.textContent = avg + '°/frame';
+        }
+
+        // Animatsiooni tsükkel
+        function animate() {
+            elements.forEach(elem => elem.update());
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Slider kuulajad
+        speedSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value) / 10;
+            speedMultiplier = value;
+            speedValue.textContent = value.toFixed(1) + 'x';
+            updateStats();
+        });
+
+        chaosSlider.addEventListener('input', (e) => {
+            chaosLevel = parseInt(e.target.value);
+            chaosValue.textContent = chaosLevel + '%';
+        });
+
+        countSlider.addEventListener('input', (e) => {
+            targetElementCount = parseInt(e.target.value);
+            countValue.textContent = targetElementCount;
+            createElements(targetElementCount);
+        });
+
+        // Nupud
+        pauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? '▶️ Jätka' : '⏸️ Paus';
+            pauseBtn.style.background = isPaused ? '#52B788' : '#667eea';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            // Lähtesta kõik seaded
+            speedSlider.value = 10;
+            chaosSlider.value = 50;
+            countSlider.value = 20;
+            speedMultiplier = 1.0;
+            chaosLevel = 50;
+            targetElementCount = 20;
+            speedValue.textContent = '1.0x';
+            chaosValue.textContent = '50%';
+            countValue.textContent = '20';
+            
+            // Taasloom elemendid
+            elements.forEach(elem => elem.remove());
+            elements = [];
+            createElements(targetElementCount);
+        });
+
+        randomizeBtn.addEventListener('click', () => {
+            // Randomiseeri kõigi elementide kiirust ja suunda
+            elements.forEach(elem => {
+                elem.baseSpeed = (Math.random() - 0.5) * 2;
+                elem.rotation = Math.random() * 360;
+            });
+        });
+
+        // Klaviatuuri kiirklahvid
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                pauseBtn.click();
+            } else if (e.key === 'r' || e.key === 'R') {
+                randomizeBtn.click();
+            } else if (e.key === 'ArrowUp') {
+                speedSlider.value = Math.min(30, parseInt(speedSlider.value) + 1);
+                speedSlider.dispatchEvent(new Event('input'));
+            } else if (e.key === 'ArrowDown') {
+                speedSlider.value = Math.max(0, parseInt(speedSlider.value) - 1);
+                speedSlider.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Ekraani suuruse muutumine
+        window.addEventListener('resize', () => {
+            elements.forEach(elem => elem.updatePosition());
+        });
+
+        // Alusta
+        createElements(targetElementCount);
+        animate();
+        updateStats();
+
+        // Uuenda statistikat perioodiliselt
+        setInterval(updateStats, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-Index Shuffle - Kihid Ülespoole</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Pealkiri */
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Playground ala */
+        .playground {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Lohistatav element */
+        .layer-element {
+            position: absolute;
+            cursor: move;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            user-select: none;
+            border-radius: 15px;
+        }
+
+        .layer-element:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .layer-element.active {
+            animation: bringToFront 0.3s ease-out;
+        }
+
+        @keyframes bringToFront {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Z-index badge */
+        .z-index-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #FF6B6B;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.5);
+            z-index: 1;
+        }
+
+        /* Kaart tüüp */
+        .card {
+            width: 250px;
+            padding: 30px;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .card .emoji {
+            font-size: 50px;
+            text-align: center;
+        }
+
+        /* Ring tüüp */
+        .circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ristkülik tüüp */
+        .rectangle {
+            width: 200px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Suur tüüp */
+        .large-card {
+            width: 300px;
+            padding: 40px;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .large-card h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .large-card p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Kontrollpaneel */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            min-width: 250px;
+        }
+
+        .control-panel h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stats {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            background: #667eea;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        button:last-child {
+            margin-bottom: 0;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button.secondary {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        button.secondary:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        /* Z-index order list */
+        .z-order-list {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .z-order-list h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .z-order-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .z-order-rank {
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .z-order-name {
+            flex: 1;
+            color: #333;
+        }
+
+        .z-order-z {
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* Info toast */
+        .toast {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 10001;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Z-Index Shuffle</h1>
+        <p>Klõpsake elementidel, et tuua need esiplaanile!</p>
+    </div>
+
+    <div class="playground" id="playground">
+        <!-- Elements will be added here by JavaScript -->
+    </div>
+
+    <div class="z-order-list">
+        <h3>🏆 Kihtide järjekord</h3>
+        <div id="orderList"></div>
+    </div>
+
+    <div class="control-panel">
+        <h3>⚙️ Kontrollid</h3>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Elemente:</span>
+                <span class="stat-value" id="elementCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Klõpse:</span>
+                <span class="stat-value" id="clickCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Max Z-Index:</span>
+                <span class="stat-value" id="maxZIndex">0</span>
+            </div>
+        </div>
+
+        <button id="addBtn">➕ Lisa element</button>
+        <button id="shuffleBtn" class="secondary">🔀 Sega järjekord</button>
+        <button id="resetBtn" class="secondary">🔄 Lähtesta</button>
+        <button id="showAllBtn" class="secondary">👁️ Näita kõiki</button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const playground = document.getElementById('playground');
+        const orderList = document.getElementById('orderList');
+        const elementCountEl = document.getElementById('elementCount');
+        const clickCountEl = document.getElementById('clickCount');
+        const maxZIndexEl = document.getElementById('maxZIndex');
+        const addBtn = document.getElementById('addBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const showAllBtn = document.getElementById('showAllBtn');
+        const toast = document.getElementById('toast');
+
+        let elements = [];
+        let clickCount = 0;
+        let currentMaxZIndex = 100;
+        let draggedElement = null;
+        let offsetX, offsetY;
+
+        // Element templates
+        const elementTemplates = [
+            {
+                type: 'card',
+                create: (id) => {
+                    const div = document.createElement('div');
+                    div.className = 'layer-element card';
+                    const emojis = ['🎨', '🎭', '🎪', '🎬', '🎮', '🎯', '🎲', '🎸', '🎹', '🎤'];
+                    div.innerHTML = `
+                        <div class="z-index-badge" data-badge="${id}">1</div>
+                        <div class="emoji">${emojis[Math.floor(Math.random() * emojis.length)]}</div>
+                        <h3>Kaart ${id}</h3>
+                        <p>Z-index kiht #${id}</p>
+                    `;
+                    return div;
+                }
+            },
+            {
+                type: 'circle',
+                create: (id) => {
+                    const div = document.createElement('div');
+                    div.className = 'layer-element circle';
+                    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+                    div.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    const emojis = ['⭐', '🌟', '✨', '💫', '🔥', '💎', '👑', '🏆'];
+                    div.innerHTML = `
+                        <div class="z-index-badge" data-badge="${id}">1</div>
+                        ${emojis[Math.floor(Math.random() * emojis.length)]}
+                    `;
+                    return div;
+                }
+            },
+            {
+                type: 'rectangle',
+                create: (id) => {
+                    const div = document.createElement('div');
+                    div.className = 'layer-element rectangle';
+                    const colors = ['#F8B500', '#52B788', '#FF6392', '#A8DADC', '#E63946', '#06FFA5'];
+                    div.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    const emojis = ['🚀', '🌈', '🦄', '🌺', '🎁', '🎈'];
+                    div.innerHTML = `
+                        <div class="z-index-badge" data-badge="${id}">1</div>
+                        ${emojis[Math.floor(Math.random() * emojis.length)]}
+                    `;
+                    return div;
+                }
+            },
+            {
+                type: 'large-card',
+                create: (id) => {
+                    const div = document.createElement('div');
+                    div.className = 'layer-element large-card';
+                    div.innerHTML = `
+                        <div class="z-index-badge" data-badge="${id}">1</div>
+                        <h2>Suur Kaart ${id}</h2>
+                        <p>See on suurem element, mis hõivab rohkem ruumi. Klõpsake sellel, et tuua esiplaanile!</p>
+                    `;
+                    return div;
+                }
+            }
+        ];
+
+        // Loo element
+        function createElement() {
+            const id = elements.length + 1;
+            const template = elementTemplates[Math.floor(Math.random() * elementTemplates.length)];
+            const element = template.create(id);
+            
+            // Random position
+            const maxX = window.innerWidth - 350;
+            const maxY = window.innerHeight - 250;
+            const x = Math.random() * maxX + 50;
+            const y = Math.random() * maxY + 50;
+            
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+            element.style.zIndex = currentMaxZIndex++;
+            
+            element.dataset.id = id;
+            element.dataset.name = template.type + ' ' + id;
+            
+            // Event listeners
+            element.addEventListener('mousedown', startDrag);
+            element.addEventListener('click', bringToFront);
+            
+            playground.appendChild(element);
+            elements.push({
+                id: id,
+                element: element,
+                zIndex: parseInt(element.style.zIndex),
+                name: element.dataset.name
+            });
+            
+            updateStats();
+            updateOrderList();
+            
+            return element;
+        }
+
+        // Lohistamine
+        function startDrag(e) {
+            if (e.target.classList.contains('z-index-badge')) return;
+            
+            draggedElement = this;
+            const rect = draggedElement.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!draggedElement) return;
+            
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            
+            draggedElement.style.left = x + 'px';
+            draggedElement.style.top = y + 'px';
+        }
+
+        function stopDrag() {
+            draggedElement = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // Too esiplaanile
+        function bringToFront(e) {
+            e.stopPropagation();
+            
+            const element = this;
+            const oldZIndex = parseInt(element.style.zIndex);
+            
+            // Uuenda z-index
+            element.style.zIndex = currentMaxZIndex++;
+            const newZIndex = parseInt(element.style.zIndex);
+            
+            // Leia element massivis
+            const elemData = elements.find(el => el.element === element);
+            if (elemData) {
+                elemData.zIndex = newZIndex;
+            }
+            
+            // Animatsioon
+            element.classList.add('active');
+            setTimeout(() => {
+                element.classList.remove('active');
+            }, 300);
+            
+            // Uuenda badge
+            const badge = element.querySelector('.z-index-badge');
+            if (badge) {
+                badge.textContent = newZIndex;
+            }
+            
+            clickCount++;
+            updateStats();
+            updateOrderList();
+            
+            showToast(`"${elemData.name}" tõstetud esiplaanile! Z-index: ${oldZIndex} → ${newZIndex}`);
+        }
+
+        // Uuenda statistikat
+        function updateStats() {
+            elementCountEl.textContent = elements.length;
+            clickCountEl.textContent = clickCount;
+            maxZIndexEl.textContent = currentMaxZIndex - 1;
+        }
+
+        // Uuenda järjekorra listi
+        function updateOrderList() {
+            // Sorteeri z-index järgi
+            const sorted = [...elements].sort((a, b) => b.zIndex - a.zIndex);
+            
+            orderList.innerHTML = '';
+            sorted.forEach((el, index) => {
+                const item = document.createElement('div');
+                item.className = 'z-order-item';
+                item.innerHTML = `
+                    <div class="z-order-rank">${index + 1}</div>
+                    <div class="z-order-name">${el.name}</div>
+                    <div class="z-order-z">z:${el.zIndex}</div>
+                `;
+                orderList.appendChild(item);
+            });
+        }
+
+        // Näita toast
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Sega järjekord
+        function shuffleZIndex() {
+            elements.forEach(el => {
+                const newZ = Math.floor(Math.random() * 1000) + 100;
+                el.element.style.zIndex = newZ;
+                el.zIndex = newZ;
+                
+                const badge = el.element.querySelector('.z-index-badge');
+                if (badge) {
+                    badge.textContent = newZ;
+                }
+            });
+            
+            currentMaxZIndex = Math.max(...elements.map(el => el.zIndex)) + 1;
+            updateStats();
+            updateOrderList();
+            showToast('Järjekord segatud!');
+        }
+
+        // Lähtesta
+        function reset() {
+            elements.forEach(el => el.element.remove());
+            elements = [];
+            clickCount = 0;
+            currentMaxZIndex = 100;
+            
+            // Loo algused elemendid
+            for (let i = 0; i < 8; i++) {
+                createElement();
+            }
+            
+            updateStats();
+            updateOrderList();
+            showToast('Lähtestatud!');
+        }
+
+        // Näita kõiki (cascade efekt)
+        function showAll() {
+            const sorted = [...elements].sort((a, b) => a.id - b.id);
+            
+            sorted.forEach((el, index) => {
+                const offsetX = index * 50;
+                const offsetY = index * 50;
+                
+                el.element.style.left = (100 + offsetX) + 'px';
+                el.element.style.top = (150 + offsetY) + 'px';
+                el.element.style.zIndex = 100 + index;
+                el.zIndex = 100 + index;
+                
+                const badge = el.element.querySelector('.z-index-badge');
+                if (badge) {
+                    badge.textContent = el.zIndex;
+                }
+            });
+            
+            currentMaxZIndex = 100 + elements.length;
+            updateStats();
+            updateOrderList();
+            showToast('Kõik elemendid nähtavad cascade režiimis!');
+        }
+
+        // Nupud
+        addBtn.addEventListener('click', () => {
+            createElement();
+            showToast('Uus element lisatud!');
+        });
+
+        shuffleBtn.addEventListener('click', shuffleZIndex);
+        resetBtn.addEventListener('click', reset);
+        showAllBtn.addEventListener('click', showAll);
+
+        // Klaviatuuri kiirklahvid
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'a' || e.key === 'A') {
+                addBtn.click();
+            } else if (e.key === 's' || e.key === 'S') {
+                shuffleBtn.click();
+            } else if (e.key === 'r' || e.key === 'R') {
+                resetBtn.click();
+            } else if (e.key === 'v' || e.key === 'V') {
+                showAllBtn.click();
+            }
+        });
+
+        // Alusta
+        reset();
+    </script>
+</body>
+</html>

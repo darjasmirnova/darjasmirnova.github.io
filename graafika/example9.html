@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pöörelnud Kohandatud Kursor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            cursor: none; /* Peidame vaikimisi kursori */
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .info {
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .info h1 {
+            margin-bottom: 20px;
+            font-size: 48px;
+        }
+
+        .info p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        /* Kohandatud kursori konteiner */
+        #custom-cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        /* Tähe kuju kursor */
+        .cursor-shape {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        /* SVG täht */
+        .star-cursor {
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+        }
+
+        /* Animeeritud jälje efekt */
+        .cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 9998;
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        /* Info boks */
+        .stats {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            z-index: 1000;
+        }
+
+        .stats div {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>🌟 Kohandatud Pöörelnud Kursor</h1>
+        <p>Liigutage hiirt, et näha tähe pöörlema!</p>
+        <p style="font-size: 16px; margin-top: 20px;">Kiirus ja suund määravad pöörlemise kiiruse</p>
+    </div>
+
+    <div class="stats">
+        <div>Kiirus: <span id="speed">0</span> px/s</div>
+        <div>Nurk: <span id="angle">0</span>°</div>
+        <div>X: <span id="posX">0</span> px</div>
+        <div>Y: <span id="posY">0</span> px</div>
+    </div>
+
+    <!-- Kohandatud kursor -->
+    <div id="custom-cursor">
+        <svg class="star-cursor cursor-shape" viewBox="0 0 51 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25.5 0L31.4084 17.7295H50.2414L35.4165 28.7115L41.3249 46.441L25.5 35.459L9.67506 46.441L15.5835 28.7115L0.758621 17.7295H19.5916L25.5 0Z" 
+                  fill="url(#starGradient)"/>
+            <defs>
+                <linearGradient id="starGradient" x1="25.5" y1="0" x2="25.5" y2="46.441" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFD700"/>
+                    <stop offset="1" stop-color="#FFA500"/>
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+        const speedDisplay = document.getElementById('speed');
+        const angleDisplay = document.getElementById('angle');
+        const posXDisplay = document.getElementById('posX');
+        const posYDisplay = document.getElementById('posY');
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        let prevMouseX = 0;
+        let prevMouseY = 0;
+        let rotation = 0;
+        let velocity = 0;
+        let lastTime = Date.now();
+
+        // Hiire liikumise jälgimine
+        document.addEventListener('mousemove', (e) => {
+            const currentTime = Date.now();
+            const deltaTime = (currentTime - lastTime) / 1000; // sekundites
+
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // Arvutame liikumise kiiruse
+            const deltaX = mouseX - prevMouseX;
+            const deltaY = mouseY - prevMouseY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            velocity = distance / deltaTime;
+
+            // Arvutame liikumise suuna
+            if (distance > 0) {
+                const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+                
+                // Pöörlemise kiirus põhineb liikumise kiirusel
+                const rotationSpeed = Math.min(velocity * 0.5, 50);
+                rotation += rotationSpeed * deltaTime;
+            }
+
+            // Uuendame kursori positsiooni ja pööramist
+            updateCursor();
+
+            // Loome jälje efekti
+            if (distance > 5) {
+                createTrail(mouseX, mouseY);
+            }
+
+            // Uuendame statistikat
+            speedDisplay.textContent = Math.round(velocity);
+            angleDisplay.textContent = Math.round(rotation % 360);
+            posXDisplay.textContent = Math.round(mouseX);
+            posYDisplay.textContent = Math.round(mouseY);
+
+            lastTime = currentTime;
+        });
+
+        // Uuendame kursori positsiooni ja pööramist
+        function updateCursor() {
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+            cursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+        }
+
+        // Loome jälje efekti
+        function createTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = x + 'px';
+            trail.style.top = y + 'px';
+            document.body.appendChild(trail);
+
+            // Eemaldame jälje pärast animatsiooni lõppu
+            setTimeout(() => {
+                trail.remove();
+            }, 500);
+        }
+
+        // Aeglustame pöörlemisväldet, kui hiir seisab paigal
+        setInterval(() => {
+            velocity *= 0.95; // Aeglustame kiiruse vähenemist
+        }, 50);
+
+        // Alustame kursori keskelt
+        mouseX = window.innerWidth / 2;
+        mouseY = window.innerHeight / 2;
+        updateCursor();
+    </script>
+</body>
+</html>

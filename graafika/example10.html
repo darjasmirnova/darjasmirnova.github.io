@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Ghost - Viivitatud Tekst</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .instructions {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        /* Peidetud sisestusväli */
+        .hidden-input {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+        }
+
+        /* Nähtav sisestusala */
+        .input-display {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 150px;
+            font-size: 28px;
+            line-height: 1.6;
+            color: #333;
+            cursor: text;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-display:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-display.focused {
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Kursor */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 32px;
+            background: #333;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Tähemärgi animatsioon */
+        .char {
+            display: inline-block;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom;
+        }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.5);
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Tühiku säilitamine */
+        .char.space {
+            width: 0.3em;
+        }
+
+        /* Statistika */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            min-width: 150px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Nupud */
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Info overlay */
+        .info-box {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Placeholder text */
+        .placeholder {
+            color: #999;
+            font-style: italic;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👻 Typing Ghost</h1>
+        <div class="instructions">
+            Klõpsake allpool olevale alale ja hakake tippima.<br>
+            Tähed ilmuvad viivitusega ja animeeritult altpoolt!
+        </div>
+
+        <div class="info-box">
+            💡 Iga tähemärk ilmub 150-300ms viivitusega ja libiseb sujuvalt üles
+        </div>
+
+        <!-- Peidetud sisendiväli -->
+        <input type="text" class="hidden-input" id="hiddenInput" autocomplete="off">
+
+        <!-- Nähtav väljund -->
+        <div class="input-display" id="displayArea" tabindex="0">
+            <span class="placeholder">Alusta tippimist...</span>
+            <span class="cursor"></span>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Tähemärke</div>
+                <div class="stat-value" id="charCount">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Sõnu</div>
+                <div class="stat-value" id="wordCount">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Järjekorras</div>
+                <div class="stat-value" id="queueCount">0</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="clearBtn">🗑️ Tühjenda</button>
+            <button id="speedBtn">⚡ Kiirus: Normaalne</button>
+        </div>
+    </div>
+
+    <script>
+        const hiddenInput = document.getElementById('hiddenInput');
+        const displayArea = document.getElementById('displayArea');
+        const charCountEl = document.getElementById('charCount');
+        const wordCountEl = document.getElementById('wordCount');
+        const queueCountEl = document.getElementById('queueCount');
+        const clearBtn = document.getElementById('clearBtn');
+        const speedBtn = document.getElementById('speedBtn');
+
+        let typedText = '';
+        let displayedText = '';
+        let charQueue = [];
+        let delays = { min: 150, max: 300 }; // ms
+        let speeds = ['Aeglane', 'Normaalne', 'Kiire'];
+        let currentSpeed = 1;
+
+        // Fookuse haldamine
+        displayArea.addEventListener('click', () => {
+            hiddenInput.focus();
+            displayArea.classList.add('focused');
+        });
+
+        hiddenInput.addEventListener('focus', () => {
+            displayArea.classList.add('focused');
+        });
+
+        hiddenInput.addEventListener('blur', () => {
+            displayArea.classList.remove('focused');
+        });
+
+        // Teksti sisestamine
+        hiddenInput.addEventListener('input', (e) => {
+            const newText = e.target.value;
+            
+            if (newText.length > typedText.length) {
+                // Uued tähemärgid lisatud
+                const newChars = newText.slice(typedText.length);
+                for (let char of newChars) {
+                    addCharToQueue(char);
+                }
+            } else if (newText.length < typedText.length) {
+                // Backspace vajutatud
+                handleBackspace(typedText.length - newText.length);
+            }
+            
+            typedText = newText;
+            updateStats();
+        });
+
+        // Lisa tähemärk järjekorda
+        function addCharToQueue(char) {
+            const delay = Math.random() * (delays.max - delays.min) + delays.min;
+            charQueue.push({ char, delay });
+            processQueue();
+        }
+
+        // Töötle järjekorda
+        function processQueue() {
+            if (charQueue.length === 0) return;
+
+            const { char, delay } = charQueue.shift();
+            
+            setTimeout(() => {
+                displayChar(char);
+                updateStats();
+                if (charQueue.length > 0) {
+                    processQueue();
+                }
+            }, delay);
+        }
+
+        // Kuva tähemärk animatsiooniga
+        function displayChar(char) {
+            const cursor = displayArea.querySelector('.cursor');
+            const placeholder = displayArea.querySelector('.placeholder');
+            
+            // Eemalda placeholder
+            if (placeholder) {
+                placeholder.remove();
+            }
+
+            const span = document.createElement('span');
+            span.className = char === ' ' ? 'char space' : 'char';
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            
+            displayArea.insertBefore(span, cursor);
+            displayedText += char;
+
+            // Keeri alla, kui tekst on pikk
+            displayArea.scrollTop = displayArea.scrollHeight;
+        }
+
+        // Käsitle backspace
+        function handleBackspace(count) {
+            const cursor = displayArea.querySelector('.cursor');
+            
+            for (let i = 0; i < count; i++) {
+                const lastChar = cursor.previousElementSibling;
+                if (lastChar && lastChar.classList.contains('char')) {
+                    lastChar.remove();
+                    displayedText = displayedText.slice(0, -1);
+                }
+            }
+
+            // Kui pole teksti, lisa placeholder tagasi
+            if (displayedText.length === 0 && !displayArea.querySelector('.placeholder')) {
+                const placeholder = document.createElement('span');
+                placeholder.className = 'placeholder';
+                placeholder.textContent = 'Alusta tippimist...';
+                displayArea.insertBefore(placeholder, cursor);
+            }
+
+            // Tühista järjekorras olevad märgid
+            const removeCount = Math.min(count, charQueue.length);
+            charQueue.splice(-removeCount);
+
+            updateStats();
+        }
+
+        // Uuenda statistikat
+        function updateStats() {
+            charCountEl.textContent = displayedText.length;
+            
+            const words = displayedText.trim().split(/\s+/).filter(w => w.length > 0);
+            wordCountEl.textContent = words.length;
+            
+            queueCountEl.textContent = charQueue.length;
+        }
+
+        // Tühjenda nupp
+        clearBtn.addEventListener('click', () => {
+            hiddenInput.value = '';
+            typedText = '';
+            displayedText = '';
+            charQueue = [];
+            
+            // Eemalda kõik tähemärgid
+            const chars = displayArea.querySelectorAll('.char');
+            chars.forEach(char => char.remove());
+            
+            // Lisa placeholder tagasi
+            if (!displayArea.querySelector('.placeholder')) {
+                const cursor = displayArea.querySelector('.cursor');
+                const placeholder = document.createElement('span');
+                placeholder.className = 'placeholder';
+                placeholder.textContent = 'Alusta tippimist...';
+                displayArea.insertBefore(placeholder, cursor);
+            }
+            
+            updateStats();
+        });
+
+        // Kiiruse muutmine
+        speedBtn.addEventListener('click', () => {
+            currentSpeed = (currentSpeed + 1) % speeds.length;
+            speedBtn.textContent = `⚡ Kiirus: ${speeds[currentSpeed]}`;
+            
+            switch (currentSpeed) {
+                case 0: // Aeglane
+                    delays = { min: 300, max: 600 };
+                    break;
+                case 1: // Normaalne
+                    delays = { min: 150, max: 300 };
+                    break;
+                case 2: // Kiire
+                    delays = { min: 50, max: 150 };
+                    break;
+            }
+        });
+
+        // Klaviatuuri kuulamine backspace jaoks
+        hiddenInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addCharToQueue('\n');
+                const newText = hiddenInput.value + '\n';
+                hiddenInput.value = newText;
+                typedText = newText;
+            }
+        });
+
+        // Automaatne fookus
+        window.addEventListener('load', () => {
+            hiddenInput.focus();
+        });
+    </script>
+</body>
+</html>

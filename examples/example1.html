@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Excuse Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Courier New', monospace;
+            /* Brawl Stars fighters background (using local image brawll.png) */
+            /* strong visible background image with slight dark overlay for legibility */
+            background: 
+                linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+                url('brawll.png') no-repeat center center fixed;
+            background-size: cover;
+            /* no blend mode to keep image crisp */
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #48cddf;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #69b5e0;
+            border-radius: 36px;
+            padding: 40px;
+            box-shadow: 
+                0 0 20px rgba(50, 127, 190, 0.3),
+                inset 0 0 20px rgba(74, 158, 190, 0.1),
+                0 0 40px rgba(89, 158, 204, 0.2);
+            animation: scanlines 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { text-shadow: 0 0 0px rgba(224, 123, 228, 0.3); }
+            50% { text-shadow: 0 0 15px rgba(79, 160, 197, 0.5); }
+            100% { text-shadow: 0 0 0px rgba(86, 183, 221, 0.3); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #5f9ed1;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: glitch 0.3s infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            opacity: 0.7;
+            margin-top: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .excuse-box {
+            background: rgba(0, 20, 0, 0.9);
+            border: 2px solid #7fd1eb;
+            border-radius: 28px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .excuse-text {
+            font-size: 1.35em;
+            line-height: 1.9;
+            word-wrap: break-word;
+            text-align: center;
+            min-height: 110px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 6px;
+        }
+
+        .word {
+            display: inline-block;
+            animation: fadeInWord 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInWord {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .shimmer {
+            opacity: 0.5;
+            font-style: italic;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: 2px solid #0066cc;
+            background: transparent;
+            color: #00a8ff;
+            cursor: pointer;
+            border-radius: 28px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(0, 168, 255, 0.7);
+            font-family: 'Comic Sans MS', monospace;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #0066cc, #00a8ff);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(0, 168, 255, 1);
+            transform: scale(1.05);
+            text-shadow: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            min-width: 150px;
+            border-color: #00d9ff;
+            color: #00d9ff;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.9);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #00a8ff, #00d9ff);
+            color: #000;
+            box-shadow: 0 0 25px rgba(0, 217, 255, 1);
+        }
+
+        .stats {
+            text-align: center;
+            font-size: 0.9em;
+            opacity: 0.8;
+            padding: 20px;
+            border-top: 2px solid #55a5ca;
+            margin-top: 20px;
+        }
+
+        #counter {
+            color: #5bb8dd;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .copy-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #74cddd;
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 28px;
+            font-weight: bold;
+            animation: slideIn 0.3s ease-out, slideOut 0.3s ease-out 2.7s;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(122, 204, 241, 0.8);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .excuse-text {
+                font-size: 1.1em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 DEV EXCUSE GENERATOR 🤖</h1>
+            <p class="subtitle">Why your code won't compile in 3.2 seconds</p>
+        </div>
+
+        <div class="excuse-box">
+            <div id="excuse" class="excuse-text">
+                <span class="shimmer">Click to generate an excuse...</span>
+            </div>
+            <div class="button-group">
+                <button id="generateBtn" class="btn btn-primary">
+                    ⚡ Generate Excuse
+                </button>
+                <button id="copyBtn" class="btn btn-secondary">
+                    📋 Copy
+                </button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <p>Excuses generated: <span id="counter">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Excuse phrase parts
+        const excuseParts = {
+            prelude: [
+                "The thing is,",
+                "Look, here's the deal:",
+                "I swear,",
+                "So basically,",
+                "Okay so,",
+                "Here's what happened:",
+            ],
+            problem: [
+                "my rubber duck got sentient",
+                "Stack Overflow was down for a nanosecond",
+                "a rogue semicolon achieved consciousness",
+                "the JavaScript gods demanded a sacrifice",
+                "my IDE sneezed and deleted a file",
+                "the cloud just had a bad day",
+                "my computer achieved enlightenment",
+                "a greedy algorithm ate all my code",
+                "my code reviewer is actually a Terminator",
+                "Babel forgot how to transpile",
+                "the code goblins rewrote my functions",
+                "npm installed sentience instead of modules",
+                "my RAM got lonely and went on strike",
+                "Git accidentally merged with reality",
+                "my CPU went to therapy",
+            ],
+            consequence: [
+                "and now my code smells like regret",
+                "so naturally the app exploded",
+                "which is why my code is now sentient",
+                "so my variables declared independence",
+                "and the entire internet short-circuited",
+                "which caused all my loops to become infinite dreams",
+                "giving your app philosophical crisis",
+                "which is why everything is 3am energy",
+                "so now my functions are just vibing",
+                "which is honestly kind of beautiful",
+                "and my commit messages became poetry",
+                "turning my code into abstract art",
+                "which we can call 'creative debugging'",
+                "opening a wormhole to CSS Hades",
+            ],
+            finale: [
+                "It's in the cosmic backlog now.",
+                "The code works in my dreams though.",
+                "Murphy's Law and I are dating.",
+                "The debugger has joined the dark side.",
+                "This is what happens when you double-click the delete key.",
+                "The mainframe is now running on Windows XP vibes.",
+                "That's why my code tastes like purple.",
+                "The build process achieved nirvana.",
+                "My IDE and I need couples therapy.",
+                "Pretty sure git rebase started a cult.",
+                "The compiler demanded overtime pay.",
+                "My code is now eligible for disability benefits.",
+            ]
+        };
+
+        let excuseCount = 0;
+        let currentExcuse = "";
+
+        const excuseEl = document.getElementById('excuse');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const counterEl = document.getElementById('counter');
+
+        // Generate random excuse
+        function generateExcuse() {
+            const prelude = excuseParts.prelude[Math.floor(Math.random() * excuseParts.prelude.length)];
+            const problem = excuseParts.problem[Math.floor(Math.random() * excuseParts.problem.length)];
+            const consequence = excuseParts.consequence[Math.floor(Math.random() * excuseParts.consequence.length)];
+            const finale = excuseParts.finale[Math.floor(Math.random() * excuseParts.finale.length)];
+
+            currentExcuse = `${prelude} ${problem} ${consequence}, ${finale}`;
+            excuseCount++;
+            counterEl.textContent = excuseCount;
+
+            // Animate text appearance
+            excuseEl.innerHTML = '';
+            animateText(currentExcuse);
+        }
+
+        // Animate text word by word with proper wrapping
+        function animateText(text) {
+            excuseEl.innerHTML = '';
+            const words = text.split(' ');
+            
+            words.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.className = 'word';
+                span.textContent = word;
+                span.style.animationDelay = `${index * 0.07}s`;
+                excuseEl.appendChild(span);
+            });
+        }
+
+        // Copy to clipboard
+        copyBtn.addEventListener('click', () => {
+            if (currentExcuse) {
+                navigator.clipboard.writeText(currentExcuse).then(() => {
+                    showToast('Copied to clipboard! 📋');
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = currentExcuse;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showToast('Copied to clipboard! 📋');
+                });
+            }
+        });
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'copy-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Generate on button click
+        generateBtn.addEventListener('click', generateExcuse);
+
+        // Generate on Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateExcuse();
+            }
+        });
+
+        // Generate initial excuse on load
+        generateExcuse();
+    </script>
+</body>
+</html>

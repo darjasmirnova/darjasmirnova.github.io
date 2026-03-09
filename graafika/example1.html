@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursor Trail</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let trail = [];
+        const maxTrailLength = 20; // Adjust for trail length
+        const fadeSpeed = 0.05; // How fast they fade
+
+        canvas.addEventListener('mousemove', (e) => {
+            trail.push({
+                x: e.clientX,
+                y: e.clientY,
+                opacity: 1
+            });
+            if (trail.length > maxTrailLength) {
+                trail.shift();
+            }
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            trail.forEach((point, index) => {
+                point.opacity -= fadeSpeed;
+                if (point.opacity <= 0) {
+                    trail.splice(index, 1);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
+                    ctx.fill();
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
