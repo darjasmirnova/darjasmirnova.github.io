@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drawing App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="toolbar">
+      <h1>Drawing App</h1>
+      <div class="controls">
+        <label>
+          Color:
+          <input id="colorPicker" type="color" value="#e7549c" />
+        </label>
+
+        <label>
+          Brush Size:
+          <input id="sizeRange" type="range" min="1" max="40" value="6" />
+          <span id="sizeValue">6</span>px
+        </label>
+
+        <button id="eraserBtn" type="button">Eraser</button>
+        <button id="clearBtn" type="button">Clear</button>
+        <button id="saveBtn" type="button">Save to Gallery</button>
+      </div>
+    </header>
+
+    <section class="canvas-wrap">
+      <canvas id="drawCanvas"></canvas>
+    </section>
+
+    <section class="gallery-wrap">
+      <div class="gallery-header">
+        <h2>Your Gallery</h2>
+        <button id="clearGalleryBtn" type="button">Clear Gallery</button>
+      </div>
+      <p id="galleryEmpty" class="gallery-empty">No saved drawings yet.</p>
+      <div id="galleryGrid" class="gallery-grid"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
