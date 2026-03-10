@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Nightmare - Küberpunk Kaamera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #f5f0f6 0%, #e8dff5 50%, #fce4ec 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(200, 180, 220, 0.05) 0px,
+                    transparent 2px,
+                    transparent 4px,
+                    rgba(200, 180, 220, 0.05) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        h1 {
+            color: #b19cd9;
+            text-transform: uppercase;
+            font-size: 2.5em;
+            text-shadow: 
+                0 0 10px rgba(177, 156, 217, 0.3),
+                0 0 20px rgba(177, 156, 217, 0.2),
+                0 0 30px rgba(255, 182, 193, 0.2);
+            letter-spacing: 5px;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            41.99% { opacity: 1; }
+            42% { opacity: 0.8; }
+            43% { opacity: 1; }
+            45.99% { opacity: 1; }
+            46% { opacity: 0.9; }
+            46.5% { opacity: 1; }
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 3px solid #d4a5d4;
+            box-shadow: 
+                0 0 20px rgba(212, 165, 212, 0.3),
+                inset 0 0 20px rgba(212, 165, 212, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .canvas-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ffb6d9, #c5cae9, #ffb6d9);
+            border-radius: 10px;
+            z-index: -1;
+            animation: borderRotate 3s linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes borderRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: rgba(250, 245, 255, 0.8);
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #9575cd;
+            border: 2px solid #ce93d8;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            box-shadow: 0 0 10px rgba(206, 147, 216, 0.3);
+            will-change: transform;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(206, 147, 216, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            pointer-events: none;
+        }
+
+        .btn:hover::before {
+            width: 250px;
+            height: 250px;
+        }
+
+        .btn:hover {
+            border-color: #f48fb1;
+            color: #f06292;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn.upload {
+            border-color: #f48fb1;
+            color: #f06292;
+            box-shadow: 0 0 10px rgba(244, 143, 177, 0.3);
+        }
+
+        .btn.upload:hover {
+            border-color: #ce93d8;
+            color: #9575cd;
+        }
+
+        .btn.active {
+            border-color: #a5d6a7;
+            color: #81c784;
+            box-shadow: 0 0 15px rgba(165, 214, 167, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .btn.effect-btn {
+            opacity: 0.5;
+        }
+
+        .btn.effect-btn.active {
+            opacity: 1;
+            border-color: #ffb74d;
+            color: #ff9800;
+            box-shadow: 0 0 15px rgba(255, 183, 77, 0.5);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1;
+            }
+            50% { 
+                opacity: 0.8;
+            }
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .status {
+            color: #9575cd;
+            font-size: 0.9em;
+            text-align: center;
+            min-height: 20px;
+            text-shadow: 0 0 5px rgba(149, 117, 205, 0.2);
+        }
+
+        video {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+                letter-spacing: 3px;
+            }
+
+            .canvas-container {
+                height: 400px;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Digital Nightmare</h1>
+        
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="controls">
+            <button id="cameraBtn" class="btn">
+                <span>📷 Lülita kaamera sisse</span>
+            </button>
+            <button id="uploadBtn" class="btn upload">
+                <span>📁 Laadi foto</span>
+            </button>
+            <button id="saveBtn" class="btn upload">
+                <span>💾 Salvesta Failina</span>
+            </button>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="controls">
+            <button id="rgbBtn" class="btn effect-btn">
+                <span>🌈 RGB Shift</span>
+            </button>
+            <button id="pixelSortBtn" class="btn effect-btn">
+                <span>🔲 Pixel Sort</span>
+            </button>
+            <button id="trailBtn" class="btn effect-btn">
+                <span>👻 Trail Effect</span>
+            </button>
+            <button id="audioBtn" class="btn effect-btn">
+                <span>📳 Screen Shake</span>
+            </button>
+            <button id="scanlinesBtn" class="btn effect-btn">
+                <span>📺 Scanlines</span>
+            </button>
+            <button id="noiseBtn" class="btn effect-btn">
+                <span>❄️ Static Noise</span>
+            </button>
+            <button id="kaleidoscopeBtn" class="btn effect-btn">
+                <span>🔶 Kaleidoscope</span>
+            </button>
+            <button id="freezeBtn" class="btn effect-btn">
+                <span>🧊 Freeze Area</span>
+            </button>
+            <button id="asciiBtn" class="btn effect-btn">
+                <span>🔤 ASCII Art</span>
+            </button>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <video id="video" autoplay playsinline></video>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const video = document.getElementById('video');
+        const cameraBtn = document.getElementById('cameraBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const saveBtn = document.getElementById('saveBtn');
+        const status = document.getElementById('status');
+
+        let stream = null;
+        let animationId = null;
+        let currentImage = null;
+        let mouseX = 0;
+        let mouseY = 0;
+        let offsetCanvas = document.createElement('canvas');
+        let offsetCtx = offsetCanvas.getContext('2d');
+
+        // Effect toggles
+        let rgbShiftEnabled = true;
+        let pixelSortEnabled = true;
+        let trailEffectEnabled = true;
+        let screenShakeEnabled = false;
+        let scanlinesEnabled = false;
+        let noiseEnabled = false;
+        let kaleidoscopeEnabled = false;
+        let kaleidoscopeSectors = 4; // 4 or 8
+        let freezeEnabled = false;
+        let frozenAreas = []; // Array of {x, y, radius, imageData}
+        let asciiEnabled = false;
+        let asciiChars = '@%#*+=-:. '; // Characters from darkest to lightest
+        let asciiGridSize = 10; // Size of each character cell
+        let saveArtifactType = 0; // 0-7 random artifact types
+
+        // Scanlines animation
+        let scanlineOffset = 0;
+
+        // Add random visual artifact to canvas
+        function addRandomArtifact(canvasCtx, canvasWidth, canvasHeight) {
+            const artifactType = Math.floor(Math.random() * 8);
+            
+            switch(artifactType) {
+                case 0: // Random color channel shift
+                    const imageData = canvasCtx.getImageData(0, 0, canvasWidth, canvasHeight);
+                    const data = imageData.data;
+                    const shift = Math.floor(Math.random() * 30) + 10;
+                    for (let i = 0; i < data.length; i += 4) {
+                        if (Math.random() > 0.7) {
+                            data[i] = Math.min(255, data[i] + shift);
+                            data[i + 2] = Math.max(0, data[i + 2] - shift);
+                        }
+                    }
+                    canvasCtx.putImageData(imageData, 0, 0);
+                    break;
+                    
+                case 1: // Digital glitch blocks
+                    for (let i = 0; i < 5 + Math.random() * 5; i++) {
+                        const glitchX = Math.random() * canvasWidth;
+                        const glitchY = Math.random() * canvasHeight;
+                        const glitchW = Math.random() * 80 + 20;
+                        const glitchH = Math.random() * 60 + 10;
+                        canvasCtx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.4})`;
+                        canvasCtx.fillRect(glitchX, glitchY, glitchW, glitchH);
+                    }
+                    break;
+                    
+                case 2: // Scan line artifacts
+                    canvasCtx.strokeStyle = `rgba(255, ${Math.random() * 100}, ${Math.random() * 100}, 0.3)`;
+                    for (let y = 0; y < canvasHeight; y += Math.random() * 4 + 2) {
+                        canvasCtx.beginPath();
+                        canvasCtx.moveTo(0, y);
+                        canvasCtx.lineTo(canvasWidth, y);
+                        canvasCtx.stroke();
+                    }
+                    break;
+                    
+                case 3: // Chromatic aberration artifact
+                    const imgDataAb = canvasCtx.getImageData(0, 0, canvasWidth, canvasHeight);
+                    const dataAb = imgDataAb.data;
+                    const abShift = Math.floor(Math.random() * 20) + 5;
+                    for (let idx = 0; idx < dataAb.length; idx += 4) {
+                        if (Math.random() > 0.85) {
+                            const temp = dataAb[idx];
+                            dataAb[idx] = dataAb[idx + 2];
+                            dataAb[idx + 2] = temp;
+                        }
+                    }
+                    canvasCtx.putImageData(imgDataAb, 0, 0);
+                    break;
+                    
+                case 4: // Random noise burst
+                    const burstX = Math.random() * canvasWidth;
+                    const burstY = Math.random() * canvasHeight;
+                    const burstSize = Math.random() * 150 + 50;
+                    canvasCtx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.5})`;
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(burstX, burstY, burstSize, 0, Math.PI * 2);
+                    canvasCtx.fill();
+                    break;
+                    
+                case 5: // Pixelation artifact
+                    const pixelSize = Math.floor(Math.random() * 10) + 5;
+                    const artifactX = Math.random() * (canvasWidth - pixelSize * 20);
+                    const artifactY = Math.random() * (canvasHeight - pixelSize * 20);
+                    const artifactW = Math.random() * pixelSize * 20 + pixelSize * 10;
+                    const artifactH = Math.random() * pixelSize * 15 + pixelSize * 8;
+                    
+                    const imgDataPix = canvasCtx.getImageData(artifactX, artifactY, artifactW, artifactH);
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = artifactW / pixelSize;
+                    tempCanvas.height = artifactH / pixelSize;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.putImageData(imgDataPix, 0, 0);
+                    canvasCtx.imageSmoothingEnabled = false;
+                    canvasCtx.drawImage(tempCanvas, 0, 0, artifactW / pixelSize, artifactH / pixelSize, artifactX, artifactY, artifactW, artifactH);
+                    canvasCtx.imageSmoothingEnabled = true;
+                    break;
+                    
+                case 6: // Vertical distortion lines
+                    for (let x = 0; x < canvasWidth; x += Math.random() * 30 + 10) {
+                        canvasCtx.strokeStyle = `rgba(${Math.random() * 150 + 100}, 100, ${Math.random() * 150 + 100}, ${Math.random() * 0.3})`;
+                        canvasCtx.lineWidth = Math.random() * 3 + 1;
+                        canvasCtx.beginPath();
+                        canvasCtx.moveTo(x, 0);
+                        const offsetAmount = Math.random() * 20;
+                        for (let y = 0; y < canvasHeight; y += 10) {
+                            canvasCtx.lineTo(x + Math.sin(y * 0.01) * offsetAmount, y);
+                        }
+                        canvasCtx.stroke();
+                    }
+                    break;
+                    
+                case 7: // Color shift vignette
+                    const gradient = canvasCtx.createRadialGradient(
+                        canvasWidth / 2, canvasHeight / 2, 0,
+                        canvasWidth / 2, canvasHeight / 2, Math.max(canvasWidth, canvasHeight)
+                    );
+                    const colorShiftR = Math.floor(Math.random() * 100) + 100;
+                    const colorShiftG = Math.floor(Math.random() * 100);
+                    const colorShiftB = Math.floor(Math.random() * 100) + 100;
+                    gradient.addColorStop(0, `rgba(${colorShiftR}, ${colorShiftG}, ${colorShiftB}, 0)`);
+                    gradient.addColorStop(1, `rgba(${colorShiftR}, ${colorShiftG}, ${colorShiftB}, 0.4)`);
+                    canvasCtx.fillStyle = gradient;
+                    canvasCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+                    break;
+            }
+        }
+
+        // Save canvas as image with artifact
+        function saveCanvasAsImage() {
+            // Create a copy of the current canvas
+            const saveCanvas = document.createElement('canvas');
+            saveCanvas.width = canvas.width;
+            saveCanvas.height = canvas.height;
+            const saveCtx = saveCanvas.getContext('2d');
+            
+            // Copy current canvas
+            saveCtx.drawImage(canvas, 0, 0);
+            
+            // Add random artifact
+            addRandomArtifact(saveCtx, saveCanvas.width, saveCanvas.height);
+            
+            // Download the image
+            saveCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                const timestamp = new Date().getTime();
+                link.download = `digital-nightmare-${timestamp}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                status.textContent = 'Fail salvestatud!';
+            });
+        }
+
+        // Track mouse movement
+        document.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = (e.clientX - rect.left - rect.width / 2) / rect.width;
+            mouseY = (e.clientY - rect.top - rect.height / 2) / rect.height;
+        });
+
+        // Set canvas size
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            if (currentImage) {
+                drawImage(currentImage);
+            }
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Draw image on canvas maintaining aspect ratio with RGB shift
+        function drawImage(source) {
+            const canvasAspect = canvas.width / canvas.height;
+            const sourceAspect = source.videoWidth ? 
+                (source.videoWidth / source.videoHeight) : 
+                (source.width / source.height);
+
+            let drawWidth, drawHeight, offsetX, offsetY;
+
+            if (sourceAspect > canvasAspect) {
+                // Source is wider
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / sourceAspect;
+                offsetX = 0;
+                offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+                // Source is taller
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * sourceAspect;
+                offsetX = (canvas.width - drawWidth) / 2;
+                offsetY = 0;
+            }
+
+            // Setup offset canvas
+            offsetCanvas.width = canvas.width;
+            offsetCanvas.height = canvas.height;
+
+            // Draw source to offset canvas
+            offsetCtx.fillStyle = 'rgba(250, 245, 255, 0.8)';
+            offsetCtx.fillRect(0, 0, offsetCanvas.width, offsetCanvas.height);
+            offsetCtx.drawImage(source, offsetX, offsetY, drawWidth, drawHeight);
+
+            // Apply kaleidoscope effect before other effects
+            if (kaleidoscopeEnabled) {
+                applyKaleidoscope();
+            }
+
+            // Get original image data
+            const originalImageData = offsetCtx.getImageData(0, 0, offsetCanvas.width, offsetCanvas.height);
+            
+            // Create working copy
+            let finalImageData = new ImageData(
+                new Uint8ClampedArray(originalImageData.data),
+                originalImageData.width,
+                originalImageData.height
+            );
+            
+            // Apply effects based on which are enabled
+            if (rgbShiftEnabled && pixelSortEnabled) {
+                // Both enabled: apply RGB shift first, then pixel sort
+                applyRGBShift(finalImageData, mouseX, mouseY);
+                applyPixelSorting(finalImageData);
+            } else if (rgbShiftEnabled) {
+                // Only RGB shift
+                applyRGBShift(finalImageData, mouseX, mouseY);
+            } else if (pixelSortEnabled) {
+                // Only pixel sort
+                applyPixelSorting(finalImageData);
+            }
+
+            // Put processed image back to offset canvas
+            offsetCtx.putImageData(finalImageData, 0, 0);
+
+            // Apply trail effect by drawing semi-transparent background on main canvas
+            if (trailEffectEnabled) {
+                ctx.fillStyle = 'rgba(250, 245, 255, 0.02)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = 'rgba(250, 245, 255, 1.0)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Draw final result with optional screen shake
+            if (screenShakeEnabled) {
+                const shakeAmount = 12;
+                const shakeX = (Math.random() - 0.5) * shakeAmount;
+                const shakeY = (Math.random() - 0.5) * shakeAmount;
+                ctx.drawImage(offsetCanvas, shakeX, shakeY);
+            } else {
+                ctx.drawImage(offsetCanvas, 0, 0);
+            }
+
+            // Apply scanlines effect
+            if (scanlinesEnabled) {
+                drawScanlines();
+            }
+
+            // Apply static noise effect
+            if (noiseEnabled) {
+                drawStaticNoise();
+            }
+
+            // Draw frozen areas on top
+            if (freezeEnabled && frozenAreas.length > 0) {
+                drawFrozenAreas();
+            }
+
+            // Draw ASCII art effect
+            if (asciiEnabled) {
+                drawASCIIArt();
+            }
+        }
+
+        // Draw ASCII art representation
+        function drawASCIIArt() {
+            // Get current canvas image
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas with background
+            ctx.fillStyle = 'rgba(250, 245, 255, 0.8)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Set up font
+            const fontSize = asciiGridSize * 0.6;
+            ctx.font = `${fontSize}px monospace`;
+            ctx.fillStyle = 'rgba(149, 117, 205, 0.8)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Sample image and draw ASCII characters
+            for (let y = 0; y < canvas.height; y += asciiGridSize) {
+                for (let x = 0; x < canvas.width; x += asciiGridSize) {
+                    // Sample the center of the grid cell
+                    const sampleX = Math.min(x + asciiGridSize / 2, width - 1);
+                    const sampleY = Math.min(y + asciiGridSize / 2, height - 1);
+                    const idx = (Math.floor(sampleY) * width + Math.floor(sampleX)) * 4;
+                    
+                    // Calculate brightness
+                    const r = data[idx];
+                    const g = data[idx + 1];
+                    const b = data[idx + 2];
+                    const brightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+                    
+                    // Map brightness to ASCII character
+                    const charIndex = Math.floor(brightness * (asciiChars.length - 1));
+                    const char = asciiChars[asciiChars.length - 1 - charIndex];
+                    
+                    // Draw character
+                    ctx.fillText(char, x + asciiGridSize / 2, y + asciiGridSize / 2);
+                }
+            }
+        }
+
+        // Draw frozen areas
+        function drawFrozenAreas() {
+            frozenAreas.forEach(area => {
+                ctx.save();
+                
+                // Create circular clipping mask
+                ctx.beginPath();
+                ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
+                ctx.clip();
+                
+                // Draw frozen image data at the correct position
+                ctx.putImageData(area.imageData, area.left, area.top);
+                
+                // Draw border around frozen area
+                ctx.restore();
+                ctx.strokeStyle = 'rgba(100, 200, 255, 0.8)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+
+        // Capture frozen area at click position
+        function captureFrozenArea(x, y) {
+            const radius = 100; // Radius of frozen area
+            
+            // Calculate bounding box for the frozen area
+            const left = Math.max(0, Math.floor(x - radius));
+            const top = Math.max(0, Math.floor(y - radius));
+            const width = Math.min(radius * 2, canvas.width - left);
+            const height = Math.min(radius * 2, canvas.height - top);
+            
+            // Get only the circular area image data
+            const imageData = ctx.getImageData(left, top, width, height);
+            
+            // Add frozen area
+            frozenAreas.push({
+                x: x,
+                y: y,
+                radius: radius,
+                imageData: imageData,
+                left: left,
+                top: top
+            });
+            
+            status.textContent = `Frozen areas: ${frozenAreas.length}`;
+        }
+
+        // Draw static noise effect
+        function drawStaticNoise() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            // Determine noise intensity
+            const baseIntensity = 0.05;
+            const intensity = baseIntensity;
+            
+            // Add random noise to random pixels
+            const pixelCount = (canvas.width * canvas.height) * intensity;
+            
+            for (let i = 0; i < pixelCount; i++) {
+                const x = Math.floor(Math.random() * canvas.width);
+                const y = Math.floor(Math.random() * canvas.height);
+                const idx = (y * canvas.width + x) * 4;
+                
+                // Random gray value for snow effect
+                const noiseValue = Math.random() * 255;
+                
+                // Blend with original pixel
+                const blendFactor = Math.random() * 0.8;
+                data[idx] = data[idx] * (1 - blendFactor) + noiseValue * blendFactor;
+                data[idx + 1] = data[idx + 1] * (1 - blendFactor) + noiseValue * blendFactor;
+                data[idx + 2] = data[idx + 2] * (1 - blendFactor) + noiseValue * blendFactor;
+            }
+            
+            // Add occasional strong white pixels ("snow")
+            const snowCount = Math.floor((canvas.width * canvas.height) * intensity * 0.2);
+            for (let i = 0; i < snowCount; i++) {
+                const x = Math.floor(Math.random() * canvas.width);
+                const y = Math.floor(Math.random() * canvas.height);
+                const idx = (y * canvas.width + x) * 4;
+                
+                const brightness = 200 + Math.random() * 55;
+                data[idx] = brightness;
+                data[idx + 1] = brightness;
+                data[idx + 2] = brightness;
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Apply kaleidoscope effect
+        function applyKaleidoscope() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = offsetCanvas.width;
+            tempCanvas.height = offsetCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Copy current image
+            tempCtx.drawImage(offsetCanvas, 0, 0);
+            
+            // Clear offset canvas
+            offsetCtx.fillStyle = 'rgba(250, 245, 255, 0.8)';
+            offsetCtx.fillRect(0, 0, offsetCanvas.width, offsetCanvas.height);
+            
+            const centerX = offsetCanvas.width / 2;
+            const centerY = offsetCanvas.height / 2;
+            const angleStep = (Math.PI * 2) / kaleidoscopeSectors;
+            
+            // Draw each sector
+            for (let i = 0; i < kaleidoscopeSectors; i++) {
+                const angle = i * angleStep;
+                
+                offsetCtx.save();
+                offsetCtx.translate(centerX, centerY);
+                offsetCtx.rotate(angle);
+                
+                // Draw triangle sector
+                offsetCtx.beginPath();
+                offsetCtx.moveTo(0, 0);
+                const radius = Math.max(offsetCanvas.width, offsetCanvas.height);
+                offsetCtx.lineTo(radius, -radius * Math.tan(angleStep / 2));
+                offsetCtx.lineTo(radius, radius * Math.tan(angleStep / 2));
+                offsetCtx.closePath();
+                offsetCtx.clip();
+                
+                // Mirror every other sector
+                if (i % 2 === 1) {
+                    offsetCtx.scale(1, -1);
+                }
+                
+                // Draw the source image
+                offsetCtx.translate(-centerX, -centerY);
+                offsetCtx.drawImage(tempCanvas, 0, 0);
+                
+                offsetCtx.restore();
+            }
+        }
+
+        // Draw scanlines effect
+        function drawScanlines() {
+            ctx.save();
+            
+            // Update animation offset
+            scanlineOffset += 0.5;
+            if (scanlineOffset > 4) scanlineOffset = 0;
+            
+            // Draw horizontal lines
+            const lineHeight = 4;
+            const lineOpacity = 0.15;
+            
+            ctx.strokeStyle = `rgba(0, 0, 0, ${lineOpacity})`;
+            ctx.lineWidth = 2;
+            
+            for (let y = scanlineOffset; y < canvas.height; y += lineHeight) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Add subtle flicker effect
+            if (Math.random() > 0.95) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.05})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Add vignette effect
+            const gradient = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0,
+                canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) / 1.5
+            );
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.restore();
+        }
+
+        // Get pixel brightness
+        function getBrightness(r, g, b) {
+            return (r * 0.299 + g * 0.587 + b * 0.114);
+        }
+
+        // Apply pixel sorting effect
+        function applyPixelSorting(imageData) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            
+            const brightnessThreshold = 100;
+            const darknessThreshold = 50;
+            
+            // Sort rows
+            for (let y = 0; y < height; y++) {
+                let startX = -1;
+                
+                for (let x = 0; x <= width; x++) {
+                    const idx = (y * width + x) * 4;
+                    const brightness = x < width ? getBrightness(data[idx], data[idx + 1], data[idx + 2]) : 0;
+                    
+                    // Start sorting region
+                    if (startX === -1 && brightness > brightnessThreshold) {
+                        startX = x;
+                    }
+                    
+                    // End sorting region
+                    if (startX !== -1 && (brightness < darknessThreshold || x === width)) {
+                        if (x - startX > 10) {
+                            sortRowSegment(data, width, y, startX, x);
+                        }
+                        startX = -1;
+                    }
+                }
+            }
+            
+            // Sort columns (with lower frequency)
+            const sortProbability = 0.3;
+            if (Math.random() > sortProbability) {
+                for (let x = 0; x < width; x += 3) {
+                    let startY = -1;
+                    
+                    for (let y = 0; y <= height; y++) {
+                        const idx = (y * width + x) * 4;
+                        const brightness = y < height ? getBrightness(data[idx], data[idx + 1], data[idx + 2]) : 0;
+                        
+                        if (startY === -1 && brightness > brightnessThreshold) {
+                            startY = y;
+                        }
+                        
+                        if (startY !== -1 && (brightness < darknessThreshold || y === height)) {
+                            if (y - startY > 10) {
+                                sortColumnSegment(data, width, x, startY, y);
+                            }
+                            startY = -1;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Sort a horizontal segment of pixels by brightness
+        function sortRowSegment(data, width, y, startX, endX) {
+            const pixels = [];
+            
+            // Extract pixels
+            for (let x = startX; x < endX; x++) {
+                const idx = (y * width + x) * 4;
+                pixels.push({
+                    r: data[idx],
+                    g: data[idx + 1],
+                    b: data[idx + 2],
+                    a: data[idx + 3],
+                    brightness: getBrightness(data[idx], data[idx + 1], data[idx + 2])
+                });
+            }
+            
+            // Sort by brightness
+            pixels.sort((a, b) => a.brightness - b.brightness);
+            
+            // Put pixels back
+            for (let i = 0; i < pixels.length; i++) {
+                const idx = (y * width + (startX + i)) * 4;
+                data[idx] = pixels[i].r;
+                data[idx + 1] = pixels[i].g;
+                data[idx + 2] = pixels[i].b;
+                data[idx + 3] = pixels[i].a;
+            }
+        }
+
+        // Sort a vertical segment of pixels by brightness
+        function sortColumnSegment(data, width, x, startY, endY) {
+            const pixels = [];
+            
+            // Extract pixels
+            for (let y = startY; y < endY; y++) {
+                const idx = (y * width + x) * 4;
+                pixels.push({
+                    r: data[idx],
+                    g: data[idx + 1],
+                    b: data[idx + 2],
+                    a: data[idx + 3],
+                    brightness: getBrightness(data[idx], data[idx + 1], data[idx + 2])
+                });
+            }
+            
+            // Sort by brightness
+            pixels.sort((a, b) => a.brightness - b.brightness);
+            
+            // Put pixels back
+            for (let i = 0; i < pixels.length; i++) {
+                const idx = ((startY + i) * width + x) * 4;
+                data[idx] = pixels[i].r;
+                data[idx + 1] = pixels[i].g;
+                data[idx + 2] = pixels[i].b;
+                data[idx + 3] = pixels[i].a;
+            }
+        }
+
+        // Apply RGB chromatic aberration effect
+        function applyRGBShift(imageData, mouseX, mouseY) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            
+            // Calculate shift amount based on mouse position
+            const baseShift = 15;
+            const maxShift = baseShift;
+            
+            const redShiftX = Math.round(mouseX * maxShift);
+            const redShiftY = Math.round(mouseY * maxShift);
+            const blueShiftX = Math.round(-mouseX * maxShift);
+            const blueShiftY = Math.round(-mouseY * maxShift);
+
+            // Create copies of color channels
+            const redChannel = new Uint8ClampedArray(width * height);
+            const greenChannel = new Uint8ClampedArray(width * height);
+            const blueChannel = new Uint8ClampedArray(width * height);
+
+            // Extract channels
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    const pos = y * width + x;
+                    redChannel[pos] = data[idx];
+                    greenChannel[pos] = data[idx + 1];
+                    blueChannel[pos] = data[idx + 2];
+                }
+            }
+
+            // Apply shifts and combine
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+
+                    // Red channel with shift
+                    const redX = x - redShiftX;
+                    const redY = y - redShiftY;
+                    if (redX >= 0 && redX < width && redY >= 0 && redY < height) {
+                        data[idx] = redChannel[redY * width + redX];
+                    }
+
+                    // Green channel (no shift)
+                    data[idx + 1] = greenChannel[y * width + x];
+
+                    // Blue channel with shift
+                    const blueX = x - blueShiftX;
+                    const blueY = y - blueShiftY;
+                    if (blueX >= 0 && blueX < width && blueY >= 0 && blueY < height) {
+                        data[idx + 2] = blueChannel[blueY * width + blueX];
+                    }
+                }
+            }
+        }
+
+        async function startCamera() {
+            try {
+                if (stream) {
+                    stopCamera();
+                    return;
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    } 
+                });
+                
+                video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    cameraBtn.classList.add('active');
+                    cameraBtn.querySelector('span').textContent = '⏸️ Peata kaamera';
+                    status.textContent = 'Kaamera töötab';
+                    currentImage = video;
+                    
+                    function draw() {
+                        drawImage(video);
+                        animationId = requestAnimationFrame(draw);
+                    }
+                    draw();
+                };
+
+            } catch (error) {
+                console.error('Kaamera viga:', error);
+                status.textContent = 'Kaamerale ei pääse: ' + error.message;
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+                cameraBtn.classList.remove('active');
+                cameraBtn.querySelector('span').textContent = '📷 Lülita kaamera sisse';
+                status.textContent = 'Kaamera peatatud';
+                
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+        }
+
+        // File upload functionality
+        function loadImage(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                status.textContent = 'Palun vali pildifail';
+                return;
+            }
+
+            stopCamera();
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    drawImage(img);
+                    status.textContent = 'Pilt laaditud: ' + file.name;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Event listeners
+        cameraBtn.addEventListener('click', startCamera);
+
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                loadImage(e.target.files[0]);
+            }
+        });
+
+        saveBtn.addEventListener('click', () => {
+            if (!currentImage) {
+                status.textContent = 'Laadi esmalt pilt või lülita kaamera sisse!';
+                return;
+            }
+            saveCanvasAsImage();
+        });
+
+        // Effect toggle buttons
+        const rgbBtn = document.getElementById('rgbBtn');
+        const pixelSortBtn = document.getElementById('pixelSortBtn');
+        const trailBtn = document.getElementById('trailBtn');
+        const shakeBtn = document.getElementById('audioBtn');
+        const scanlinesBtn = document.getElementById('scanlinesBtn');
+        const noiseBtn = document.getElementById('noiseBtn');
+        const kaleidoscopeBtn = document.getElementById('kaleidoscopeBtn');
+        const freezeBtn = document.getElementById('freezeBtn');
+        const asciiBtn = document.getElementById('asciiBtn');
+
+        rgbBtn.classList.add('active');
+        pixelSortBtn.classList.add('active');
+        trailBtn.classList.add('active');
+
+        rgbBtn.addEventListener('click', () => {
+            rgbShiftEnabled = !rgbShiftEnabled;
+            rgbBtn.classList.toggle('active');
+            status.textContent = `RGB Shift: ${rgbShiftEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        pixelSortBtn.addEventListener('click', () => {
+            pixelSortEnabled = !pixelSortEnabled;
+            pixelSortBtn.classList.toggle('active');
+            status.textContent = `Pixel Sort: ${pixelSortEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        trailBtn.addEventListener('click', () => {
+            trailEffectEnabled = !trailEffectEnabled;
+            trailBtn.classList.toggle('active');
+            status.textContent = `Trail Effect: ${trailEffectEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        shakeBtn.addEventListener('click', () => {
+            screenShakeEnabled = !screenShakeEnabled;
+            shakeBtn.classList.toggle('active');
+            status.textContent = `Screen Shake: ${screenShakeEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        scanlinesBtn.addEventListener('click', () => {
+            scanlinesEnabled = !scanlinesEnabled;
+            scanlinesBtn.classList.toggle('active');
+            status.textContent = `Scanlines: ${scanlinesEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        noiseBtn.addEventListener('click', () => {
+            noiseEnabled = !noiseEnabled;
+            noiseBtn.classList.toggle('active');
+            status.textContent = `Static Noise: ${noiseEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        kaleidoscopeBtn.addEventListener('click', () => {
+            kaleidoscopeEnabled = !kaleidoscopeEnabled;
+            kaleidoscopeBtn.classList.toggle('active');
+            
+            // Toggle between 4 and 8 sectors with each click when enabled
+            if (kaleidoscopeEnabled) {
+                kaleidoscopeSectors = kaleidoscopeSectors === 4 ? 8 : 4;
+                status.textContent = `Kaleidoscope: ${kaleidoscopeSectors} sectors`;
+            } else {
+                status.textContent = 'Kaleidoscope: Välja';
+            }
+        });
+
+        freezeBtn.addEventListener('click', () => {
+            freezeEnabled = !freezeEnabled;
+            freezeBtn.classList.toggle('active');
+            
+            if (!freezeEnabled) {
+                // Clear all frozen areas when disabling
+                frozenAreas = [];
+                status.textContent = 'Freeze: Välja';
+            } else {
+                status.textContent = 'Freeze: Sisse - Kliki, et külmutada ala';
+            }
+        });
+
+        asciiBtn.addEventListener('click', () => {
+            asciiEnabled = !asciiEnabled;
+            asciiBtn.classList.toggle('active');
+            status.textContent = `ASCII Art: ${asciiEnabled ? 'Sisse' : 'Välja'}`;
+        });
+
+        // Handle canvas clicks for freeze effect
+        canvas.addEventListener('click', (e) => {
+            if (freezeEnabled) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                captureFrozenArea(x, y);
+            }
+        });
+
+        // Drag and drop support
+        canvas.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            canvas.style.opacity = '0.7';
+        });
+
+        canvas.addEventListener('dragleave', () => {
+            canvas.style.opacity = '1';
+        });
+
+        canvas.addEventListener('drop', (e) => {
+            e.preventDefault();
+            canvas.style.opacity = '1';
+            
+            if (e.dataTransfer.files.length > 0) {
+                loadImage(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Draw initial grid pattern
+        function drawInitialPattern() {
+            ctx.fillStyle = 'rgba(250, 245, 255, 0.8)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'rgba(206, 147, 216, 0.15)';
+            ctx.lineWidth = 1;
+            
+            const gridSize = 50;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            ctx.font = '20px Courier New';
+            ctx.fillStyle = 'rgba(149, 117, 205, 0.4)';
+            ctx.textAlign = 'center';
+            ctx.fillText('READY TO CAPTURE', canvas.width / 2, canvas.height / 2);
+        }
+
+        drawInitialPattern();
+    </script>
+</body>
+</html>
