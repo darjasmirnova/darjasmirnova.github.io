@@ -1,0 +1,147 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #0a0e27;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #0a0e27;
+    cursor: crosshair;
+}
+
+.button-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.instruments {
+    display: flex;
+    gap: 8px;
+}
+
+.effects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.04);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.instrument-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 0;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.45);
+}
+
+.instrument-btn.active {
+    box-shadow: 0 0 24px currentColor, inset 0 0 14px rgba(255, 255, 255, 0.25);
+}
+
+#bassBtn {
+    background: linear-gradient(135deg, #ff3333, #cc0000);
+    color: #ff3333;
+}
+
+#pianoBtn {
+    background: linear-gradient(135deg, #3366ff, #0033cc);
+    color: #3366ff;
+}
+
+#synthBtn {
+    background: linear-gradient(135deg, #ffff00, #ffcc00);
+    color: #ffd500;
+}
+
+.effect-btn,
+#clearBtn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #dff7ff;
+    background: linear-gradient(135deg, #17203e, #102247);
+    border: 2px solid #00d4ff;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+}
+
+.effect-btn.active,
+#clearBtn {
+    background: linear-gradient(135deg, #00d4ff, #0088ff);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.55);
+}
+
+.effect-btn.recording {
+    background: linear-gradient(135deg, #cc0000, #880000);
+    border-color: #ff4444;
+    color: #fff;
+    animation: looperPulse 0.5s infinite alternate;
+}
+
+@keyframes looperPulse {
+    from { box-shadow: 0 0 10px rgba(255, 60, 60, 0.5); }
+    to   { box-shadow: 0 0 24px rgba(255, 60, 60, 1); }
+}
+
+#shakeBtn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #7b2ff7, #3d0099);
+    border: 2px solid #bb66ff;
+    box-shadow: 0 0 12px rgba(170, 80, 255, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#shakeBtn:hover {
+    box-shadow: 0 0 20px rgba(170, 80, 255, 0.7);
+}
+
+#shakeBtn.exploding {
+    animation: shakePulse 0.12s infinite alternate;
+}
+
+@keyframes shakePulse {
+    from { box-shadow: 0 0 10px rgba(170, 80, 255, 0.5); transform: translateX(-2px); }
+    to   { box-shadow: 0 0 30px rgba(170, 80, 255, 1); transform: translateX(2px); }
+}

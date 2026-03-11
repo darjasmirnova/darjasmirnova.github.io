@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joonistusrakendus</title>
+    <link rel="stylesheet" href="drawing_app.css">
+</head>
+<body>
+    <div class="container">
+        <canvas id="drawingCanvas"></canvas>
+        <div class="button-container">
+            <div class="instruments">
+                <button id="bassBtn" class="instrument-btn active" title="Aggressive bass"></button>
+                <button id="pianoBtn" class="instrument-btn" title="Soft piano"></button>
+                <button id="synthBtn" class="instrument-btn" title="Bright synth"></button>
+            </div>
+            <div class="effects-container">
+                <button id="fadeOutBtn" class="effect-btn active">Fade</button>
+                <button id="echoBtn" class="effect-btn active">Echo</button>
+                <button id="speedBtn" class="effect-btn active">Speed</button>
+                <button id="magneticBtn" class="effect-btn">Magnetic</button>
+                <button id="mirrorBtn" class="effect-btn">Mirror</button>
+                <button id="oscillogramBtn" class="effect-btn">Waveform</button>
+                <button id="looperBtn" class="effect-btn">Loop</button>
+                <button id="atmosphereBtn" class="effect-btn">Atmosphere</button>
+            </div>
+            <button id="shakeBtn">✨ Explode</button>
+            <button id="clearBtn">Clear</button>
+        </div>
+    </div>
+
+    <script src="drawing_app.js"></script>
+</body>
+</html>
