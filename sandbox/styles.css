@@ -1,0 +1,199 @@
+:root {
+  --bg-top: #f4efe6;
+  --bg-bottom: #e3d4bc;
+  --panel: rgba(255, 245, 228, 0.9);
+  --text: #2f2218;
+  --muted: #695441;
+  --accent: #c05e1f;
+  --accent-strong: #a84e17;
+  --edge: #d7bda0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 255, 255, 0.55), transparent 42%),
+    radial-gradient(circle at 90% 18%, rgba(243, 181, 109, 0.28), transparent 40%),
+    linear-gradient(165deg, var(--bg-top), var(--bg-bottom));
+}
+
+.layout {
+  width: min(1120px, 100% - 2rem);
+  margin: 1.2rem auto;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.toolbar {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(56, 36, 20, 0.08);
+  backdrop-filter: blur(3px);
+  padding: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+h1 {
+  margin: 0 0.55rem 0 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  letter-spacing: 0.01em;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+  padding: 0.38rem 0.56rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(212, 183, 154, 0.72);
+}
+
+.group-block {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.group-title {
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mode-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.force-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.density-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.time-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.action-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mode-btn {
+  background: #baa48b;
+}
+
+.force-btn {
+  background: #b7a38d;
+}
+
+.density-btn {
+  background: #b7a38d;
+}
+
+.time-btn {
+  background: #baa48b;
+}
+
+.mode-btn.is-active {
+  background: var(--accent);
+}
+
+.force-btn.is-active {
+  background: var(--accent);
+}
+
+.density-btn.is-active {
+  background: var(--accent);
+}
+
+.time-btn.is-active {
+  background: var(--accent);
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+  width: 112px;
+}
+
+button {
+  border: 1px solid rgba(145, 89, 50, 0.18);
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.48rem 0.9rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+button:hover {
+  background: var(--accent-strong);
+  box-shadow: 0 6px 14px rgba(160, 84, 35, 0.22);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+#paint {
+  width: 100%;
+  height: min(70vh, 620px);
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  box-shadow: 0 14px 28px rgba(55, 35, 18, 0.12);
+  background:
+    radial-gradient(circle at 20% 15%, #ffffff 0%, #f6eee4 62%),
+    linear-gradient(145deg, #faf4ea, #efe2d1);
+  touch-action: none;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  opacity: 0.95;
+}
+
+@media (max-width: 760px) {
+  .toolbar {
+    gap: 0.5rem;
+    padding: 0.7rem;
+  }
+
+  .group-block {
+    width: 100%;
+  }
+
+  .control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  input[type="range"] {
+    width: 58%;
+  }
+}
