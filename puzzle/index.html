@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Puzzle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260319-19">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top controls: difficulty, upload/camera, puzzle actions and audio toggles -->
+    <header class="top-bar">
+      <h1>Pixel Puzzle</h1>
+      <div class="controls">
+        <input type="file" id="imageInput" accept="image/*" hidden>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+        <input type="file" id="musicInput" accept="audio/*" hidden>
+        <label for="difficultySelect" class="difficulty-wrap">
+          <select id="difficultySelect" class="difficulty-select" aria-label="Choose difficulty">
+            <option value="3">3x3</option>
+            <option value="5" selected>5x5</option>
+            <option value="10">10x10</option>
+          </select>
+        </label>
+        <button id="uploadBtn" class="btn">Upload Photo</button>
+        <button id="cameraBtn" class="btn">Camera</button>
+        <button id="sliceBtn" class="btn btn-accent">Cut into Puzzle</button>
+        <button id="shapeBtn" class="btn">Shape: Triangles</button>
+        <button id="previewBtn" class="btn">Preview</button>
+        <button id="snapBtn" class="btn">Magnet: Off</button>
+        <button id="musicBtn" class="btn">Music: Choose</button>
+        <button id="soundFxBtn" class="btn">SFX: On</button>
+      </div>
+    </header>
+
+    <!-- Main game area: assembly board and source image preview -->
+    <main class="workspace">
+      <section class="board-panel panel">
+        <div class="panel-title">Assembly Board</div>
+        <!-- Board layout: records table on the left, puzzle grid on the right -->
+        <div class="board-layout">
+          <div class="records-panel board-records">
+            <div class="panel-title records-title">Records</div>
+            <div class="records-table-wrap">
+              <table class="records-table" aria-label="Records table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Time</th>
+                    <th>Mode</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recordsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="boardStage" class="board-stage">
+            <img id="ghostImage" class="ghost-image" alt="Ghost image hint" />
+            <div id="assemblyGrid" class="assembly-grid" aria-label="Assembly board 5 by 5"></div>
+            <div id="winMessage" class="win-message" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="source-panel panel">
+        <div class="panel-title">Source Image</div>
+        <div class="source-frame">
+          <img id="sourceImage" alt="Uploaded image" />
+          <div id="sourcePlaceholder" class="placeholder">Upload a photo to start</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Storage area where unplaced puzzle pieces are kept -->
+    <section class="storage panel">
+      <div id="piecesStorage" class="pieces-storage" aria-label="Puzzle pieces storage"></div>
+    </section>
+  </div>
+
+  <canvas id="explosionCanvas" class="explosion-canvas" aria-hidden="true"></canvas>
+
+  <script src="script.js?v=20260319-9"></script>
+</body>
+</html>
