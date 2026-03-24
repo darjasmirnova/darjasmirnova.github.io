@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Галерея Кошек</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐱 Галерея Кошек</h1>
+            <p class="subtitle">Красивые фото кошек со всего мира</p>
+        </header>
+
+        <div class="controls">
+            <button id="loadBtn" class="btn">Загрузить кошек</button>
+            <button id="clearBtn" class="btn btn-secondary">Очистить</button>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Загрузка кошек...</p>
+        </div>
+
+        <div id="cards" class="cards-container">
+            <!-- Карточки кошек будут вставлены сюда -->
+        </div>
+
+        <div id="error" class="error hidden"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

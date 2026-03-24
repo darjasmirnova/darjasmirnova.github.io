@@ -1,0 +1,17 @@
+{
+  "name": "cat-app",
+  "version": "1.0.0",
+  "description": "Web application to display cats from The Cat API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["cats", "api"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  }
+}

@@ -1,0 +1,250 @@
+:root {
+  --bg-1: #1d2a4d;
+  --bg-2: #5e7aa7;
+  --fg: #ffffff;
+  --card: rgba(8, 12, 20, 0.48);
+  --border: rgba(255, 255, 255, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: var(--fg);
+  background: radial-gradient(circle at 20% 30%, var(--bg-2), transparent 40%),
+    linear-gradient(135deg, var(--bg-1), #0f172a);
+  transition: background 450ms ease;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+body[data-emotion="happy"] {
+  --bg-1: #f97316;
+  --bg-2: #facc15;
+}
+
+body[data-emotion="sad"] {
+  --bg-1: #0f172a;
+  --bg-2: #334155;
+}
+
+body[data-emotion="angry"] {
+  --bg-1: #7f1d1d;
+  --bg-2: #ef4444;
+}
+
+body[data-emotion="neutral"] {
+  --bg-1: #1e293b;
+  --bg-2: #64748b;
+}
+
+.bg-decor {
+  position: fixed;
+  width: 42vw;
+  height: 42vw;
+  border-radius: 50%;
+  filter: blur(46px);
+  opacity: 0.3;
+  pointer-events: none;
+  transition: transform 800ms ease, background 450ms ease;
+}
+
+.bg-decor-a {
+  top: -10vw;
+  right: -8vw;
+  background: rgba(255, 255, 255, 0.34);
+  animation: driftA 8s ease-in-out infinite;
+}
+
+.bg-decor-b {
+  left: -12vw;
+  bottom: -12vw;
+  background: rgba(0, 0, 0, 0.28);
+  animation: driftB 10s ease-in-out infinite;
+}
+
+@keyframes driftA {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-2vw, 1.5vw);
+  }
+}
+
+@keyframes driftB {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2vw, -1vw);
+  }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  width: min(2500px, 99.5vw);
+  margin: 0;
+  padding: 0;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(6.8rem, 9.8vw, 9.8rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+.app-header p {
+  margin: 10px 0 0;
+  max-width: 65ch;
+  font-size: clamp(2.58rem, 3.7vw, 3.2rem);
+  opacity: 0.95;
+}
+
+.card {
+  margin-top: 16px;
+  backdrop-filter: blur(8px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 86px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.25);
+}
+
+.video-wrap {
+  position: relative;
+  width: 100%;
+  min-height: clamp(1460px, 99vh, 2040px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+  aspect-ratio: 16 / 9;
+}
+
+#video,
+#overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#video {
+  transform: scaleX(-1);
+}
+
+#overlay {
+  transform: scaleX(-1);
+}
+
+.controls {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.control-btn {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--fg);
+  border-radius: 12px;
+  padding: 16px 18px;
+  font: inherit;
+  font-size: clamp(1.4rem, 1.8vw, 2rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 150ms ease, background 180ms ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.status {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 14px;
+  font-size: 3.1rem;
+}
+
+.status p {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 34px 38px;
+  border-radius: 12px;
+}
+
+.status strong {
+  font-weight: 700;
+}
+
+.hint {
+  margin: 12px 0 2px;
+  font-size: 2.44rem;
+  opacity: 0.95;
+}
+
+@media (max-width: 720px) {
+  body {
+    align-items: flex-start;
+    padding: 16px 10px;
+  }
+
+  .app {
+    width: 98vw;
+  }
+
+  .app-header h1 {
+    font-size: clamp(6rem, 16vw, 7.8rem);
+  }
+
+  .app-header p {
+    font-size: 2.26rem;
+  }
+
+  .card {
+    border-radius: 16px;
+    padding: 50px;
+  }
+
+  .video-wrap {
+    min-height: 1020px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .status {
+    grid-template-columns: 1fr;
+    font-size: 2.34rem;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .control-btn {
+    font-size: 1.8rem;
+  }
+
+  .hint {
+    font-size: 1.98rem;
+  }
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emotsiooni Kaamera</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.min.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+
+    <main class="app">
+      <header class="panel">
+        <h1>Emotsiooni Kaamera</h1>
+        <p>
+          Luba kaamera. Rakendus tuvastab emotsiooni: <strong>rõõm</strong>,
+          <strong>kurbus</strong>, <strong>neutraalne</strong>,
+          <strong>viha</strong>.
+        </p>
+        <p class="status" id="status">Valmistun mudelite laadimiseks...</p>
+      </header>
+
+      <section class="camera-wrap panel">
+        <div class="camera-actions">
+          <button id="cameraToggle" type="button">Включить камеру</button>
+        </div>
+        <video id="video" autoplay muted playsinline></video>
+      </section>
+
+      <section class="result panel">
+        <h2>Hetke emotsioon</h2>
+        <p id="emotionText">-</p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Local Camera Server",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"--yes",
+				"serve",
+				"-s",
+				".",
+				"-l",
+				"5500",
+				"--no-clipboard"
+			],
+			"isBackground": true,
+			"group": "build"
+		}
+	]
+}

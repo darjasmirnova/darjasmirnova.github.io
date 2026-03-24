@@ -1,0 +1,227 @@
+:root {
+  --bg-main: #e7f7ef;
+  --bg-accent: #9dd9ff;
+  --text: #11231e;
+  --panel: rgba(255, 255, 255, 0.72);
+  --border: rgba(17, 35, 30, 0.12);
+
+  --joy-main: #fff3b0;
+  --joy-accent: #ff9f68;
+
+  --sad-main: #b9dbff;
+  --sad-accent: #6f93c9;
+
+  --neutral-main: #dde5ed;
+  --neutral-accent: #9caab7;
+
+  --angry-main: #ffc4b8;
+  --angry-accent: #ff6a52;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 15% 20%, var(--bg-accent) 0%, transparent 44%),
+    radial-gradient(circle at 85% 75%, #ffffff 0%, transparent 45%),
+    linear-gradient(125deg, var(--bg-main), #ffffff);
+  background-attachment: fixed;
+  transition: background 600ms ease;
+  overflow-x: hidden;
+}
+
+.bg-shape {
+  position: fixed;
+  width: 42vmax;
+  height: 42vmax;
+  border-radius: 999px;
+  filter: blur(42px);
+  opacity: 0.35;
+  pointer-events: none;
+  transition: transform 700ms ease;
+}
+
+.bg-shape-a {
+  top: -12vmax;
+  left: -8vmax;
+  background: #f7ff93;
+  animation: driftA 9s ease-in-out infinite;
+}
+
+.bg-shape-b {
+  right: -10vmax;
+  bottom: -15vmax;
+  background: #68c0ff;
+  animation: driftB 11s ease-in-out infinite;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 10px 30px;
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 35px rgba(30, 57, 49, 0.08);
+  padding: 18px;
+}
+
+h1,
+h2 {
+  margin: 0 0 8px;
+  font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+}
+
+p {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+  line-height: 1.5;
+}
+
+.status {
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+}
+
+.camera-wrap {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.camera-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#cameraToggle {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+  background: linear-gradient(120deg, #ff7b41, #e13f33);
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(225, 63, 51, 0.25);
+  transition: transform 160ms ease, box-shadow 200ms ease, opacity 200ms ease;
+}
+
+#cameraToggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(225, 63, 51, 0.32);
+}
+
+#cameraToggle:active {
+  transform: translateY(0);
+}
+
+#cameraToggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+video {
+  width: min(98vw, 1320px);
+  aspect-ratio: 1 / 1;
+  height: auto;
+  min-height: 900px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #141414;
+}
+
+.result p {
+  font-size: clamp(1.6rem, 4.2vw, 2.5rem);
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+body.emotion-joy {
+  --bg-main: var(--joy-main);
+  --bg-accent: var(--joy-accent);
+}
+
+body.emotion-sad {
+  --bg-main: var(--sad-main);
+  --bg-accent: var(--sad-accent);
+}
+
+body.emotion-neutral {
+  --bg-main: var(--neutral-main);
+  --bg-accent: var(--neutral-accent);
+}
+
+body.emotion-angry {
+  --bg-main: var(--angry-main);
+  --bg-accent: var(--angry-accent);
+}
+
+@keyframes driftA {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(4vmax, 2vmax);
+  }
+}
+
+@keyframes driftB {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-4vmax, -2vmax);
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 16px 12px 24px;
+  }
+
+  .panel {
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  #cameraToggle {
+    width: 100%;
+  }
+
+  video {
+    width: min(98vw, 760px);
+    min-height: 520px;
+  }
+}

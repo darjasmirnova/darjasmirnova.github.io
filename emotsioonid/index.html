@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotion Camera Background</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-emotion="neutral">
+  <div class="bg-decor bg-decor-a" aria-hidden="true"></div>
+  <div class="bg-decor bg-decor-b" aria-hidden="true"></div>
+
+  <main class="app">
+    <header class="app-header">
+      <h1>Emotion Reactive Camera</h1>
+      <p>
+        The app reads your face expression from the camera and updates the full page background.
+      </p>
+    </header>
+
+    <section class="card">
+      <div class="video-wrap" id="videoWrap">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+
+      <div class="controls" aria-label="camera controls">
+        <button class="control-btn" id="startCamera" type="button">Start Camera</button>
+        <button class="control-btn" id="toggleDetect" type="button">Pause Detection</button>
+        <button class="control-btn" id="snapshot" type="button">Take Snapshot</button>
+        <button class="control-btn" id="fullscreen" type="button">Fullscreen</button>
+      </div>
+
+      <div class="status" id="status">
+        <p><strong>Emotion:</strong> <span id="emotion">neutral</span></p>
+        <p><strong>Confidence:</strong> <span id="confidence">0%</span></p>
+      </div>
+
+      <p class="hint" id="hint">
+        Please allow camera access. Keep your face visible and centered.
+      </p>
+    </section>
+  </main>
+
+  <script defer src="./node_modules/face-api.js/dist/face-api.min.js"></script>
+  <script defer src="./app.js"></script>
+</body>
+</html>
