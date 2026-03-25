@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Musical Portrait</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Manrope:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-left"></div>
+    <div class="bg-shape bg-shape-right"></div>
+
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">Photo to Sound</p>
+        <h1>Musical Portrait</h1>
+        <p class="subtitle">
+          Upload a photo: its colors and detected objects will be transformed
+          into a unique musical composition.
+        </p>
+      </header>
+
+      <section class="panel controls-panel">
+        <label class="upload-label" for="photoInput">Choose Photo</label>
+        <input id="photoInput" type="file" accept="image/*" />
+        <div id="dropZone" class="drop-zone">Drop image here for instant analysis</div>
+
+        <div class="advanced-controls">
+          <label class="control-field">
+            Style
+            <select id="stylePreset">
+              <option value="cinematic">Cinematic</option>
+              <option value="chill">Chill</option>
+              <option value="arcade">Arcade</option>
+              <option value="organic">Organic</option>
+            </select>
+          </label>
+
+          <label class="control-field">
+            Energy <span id="energyValue">62</span>
+            <input id="energySlider" type="range" min="20" max="100" value="62" />
+          </label>
+
+          <label class="control-field">
+            Complexity <span id="complexityValue">56</span>
+            <input id="complexitySlider" type="range" min="20" max="100" value="56" />
+          </label>
+
+          <label class="control-field">
+            Reverb <span id="reverbValue">35</span>%
+            <input id="reverbSlider" type="range" min="0" max="80" value="35" />
+          </label>
+
+          <label class="control-check">
+            <input id="fastModeToggle" type="checkbox" />
+            Fast mode (skip object detection)
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="analyzeButton" class="action-btn">Analyze and Play</button>
+          <button id="variationButton" class="action-btn">Generate Variation</button>
+          <button id="saveButton" class="action-btn">Save to Favorites</button>
+          <button id="exportButton" class="action-btn">Export JSON</button>
+          <button id="stopButton" class="action-btn ghost">Stop</button>
+        </div>
+
+        <p id="statusText" class="status">Waiting for an image...</p>
+      </section>
+
+      <section class="panel preview-panel">
+        <img id="previewImage" alt="Preview of the uploaded image" />
+        <canvas id="analysisCanvas" width="256" height="256" hidden></canvas>
+        <canvas id="visualizerCanvas" width="920" height="180"></canvas>
+      </section>
+
+      <section class="panel report-panel">
+        <h2>Analysis Result</h2>
+        <div class="report-grid">
+          <div>
+            <h3>Palette</h3>
+            <div id="palette" class="palette"></div>
+          </div>
+          <div>
+            <h3>Objects</h3>
+            <ul id="objectsList" class="objects-list"></ul>
+          </div>
+          <div>
+            <h3>Music Parameters</h3>
+            <ul id="musicMeta" class="meta-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel favorites-panel">
+        <h2>Favorites</h2>
+        <p class="subtitle compact">Saved tracks are stored in your browser.</p>
+        <ul id="favoritesList" class="favorites-list"></ul>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
