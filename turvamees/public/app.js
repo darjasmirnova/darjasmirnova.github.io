@@ -1,4 +1,5 @@
 const startBtn = document.getElementById('startBtn');
+const testSoundBtn = document.getElementById('testSoundBtn');
 const muteBtn = document.getElementById('muteBtn');
 const video = document.getElementById('video');
 const overlay = document.getElementById('overlay');
@@ -57,22 +58,28 @@ function logEvent(message, severity = 'ok') {
   }
 }
 
-function ensureAudioContext() {
+async function ensureAudioContext() {
   if (!audioContext) {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
 
   if (audioContext.state === 'suspended') {
-    audioContext.resume();
+    await audioContext.resume();
   }
+
+  return audioContext.state === 'running';
 }
 
-function playSound(direction) {
+async function playSound(direction) {
   if (isMuted || !directionSounds[direction]) {
     return;
   }
 
-  ensureAudioContext();
+  const isAudioReady = await ensureAudioContext();
+  if (!isAudioReady) {
+    logEvent('Браузер заблокировал звук. Нажмите "Тест звука".', 'alert');
+    return;
+  }
 
   const cfg = directionSounds[direction];
   const now = audioContext.currentTime;
@@ -305,8 +312,21 @@ async function startCamera() {
 }
 
 startBtn.addEventListener('click', async () => {
-  ensureAudioContext();
+  const isAudioReady = await ensureAudioContext();
+  if (isAudioReady) {
+    // Play a short confirmation beep inside a user gesture to unlock audio on strict browsers.
+    await playSound('forward');
+    logEvent('Звук активирован.', 'ok');
+  } else {
+    logEvent('Не удалось активировать звук в браузере.', 'alert');
+  }
+
   await startCamera();
+});
+
+testSoundBtn.addEventListener('click', async () => {
+  await playSound('right');
+  logEvent('Тест звука выполнен.', 'ok');
 });
 
 muteBtn.addEventListener('click', () => {

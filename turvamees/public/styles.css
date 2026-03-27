@@ -108,6 +108,12 @@ h1 {
   box-shadow: 0 8px 20px rgba(255, 107, 53, 0.45);
 }
 
+.btn-secondary {
+  background: linear-gradient(120deg, var(--accent-2), #80ffea);
+  color: #042033;
+  box-shadow: 0 8px 20px rgba(30, 203, 225, 0.35);
+}
+
 .btn-ghost {
   background: rgba(255, 255, 255, 0.12);
   color: #f4f7fb;
