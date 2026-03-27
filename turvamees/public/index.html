@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turvamees Motion Guard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Rajdhani:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-left"></div>
+    <div class="bg-shape bg-shape-right"></div>
+
+    <main class="container">
+      <header class="hero">
+        <p class="kicker">Node.js + Camera Vision Demo</p>
+        <h1>Turvamees Motion Guard</h1>
+        <p class="subtitle">
+          Приложение отслеживает движение объекта с камеры и ставит отдельный
+          звук на каждое направление: влево, вправо, вверх, вниз, вперед и назад.
+        </p>
+
+        <div class="hero-actions">
+          <button id="startBtn" class="btn btn-primary">Включить камеру</button>
+          <button id="muteBtn" class="btn btn-ghost">Выключить звук</button>
+          <a class="btn btn-link" href="../index.html">На главную портфолио</a>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="camera-wrap">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <p id="cameraStatus" class="camera-status">Камера отключена</p>
+        </div>
+
+        <aside class="stats">
+          <h2>Состояние системы</h2>
+          <div class="stat-row">
+            <span>Последнее движение</span>
+            <strong id="movementLabel">-</strong>
+          </div>
+          <div class="stat-row">
+            <span>Уверенность</span>
+            <strong id="confidenceLabel">0%</strong>
+          </div>
+          <div class="stat-row">
+            <span>Детектор</span>
+            <strong id="detectorStatus">Ожидание</strong>
+          </div>
+
+          <h3>Лента событий</h3>
+          <ul id="eventLog" class="event-log"></ul>
+        </aside>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
