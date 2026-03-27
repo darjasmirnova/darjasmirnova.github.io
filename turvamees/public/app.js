@@ -30,12 +30,12 @@ const MIN_MOTION_PIXELS = 500;
 const MOVEMENT_COOLDOWN_MS = 700;
 
 const directionLabels = {
-  left: 'Влево',
-  right: 'Вправо',
-  up: 'Вверх',
-  down: 'Вниз',
-  forward: 'Вперед',
-  backward: 'Назад (ТРЕВОГА)'
+  left: 'Left',
+  right: 'Right',
+  up: 'Up',
+  down: 'Down',
+  forward: 'Forward',
+  backward: 'Backward (ALERT)'
 };
 
 const directionSounds = {
@@ -76,26 +76,26 @@ function describeCameraError(error) {
   const name = error && error.name ? error.name : 'UnknownError';
 
   if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-    return 'Доступ к камере запрещен. Разрешите доступ к камере в браузере и перезагрузите страницу.';
+    return 'Camera access was denied. Allow camera access in your browser and refresh the page.';
   }
 
   if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
-    return 'Камера не найдена. Подключите камеру и проверьте настройки устройства.';
+    return 'No camera device found. Connect a camera and check your device settings.';
   }
 
   if (name === 'NotReadableError' || name === 'TrackStartError') {
-    return 'Камера занята другим приложением. Закройте Zoom/Teams/Discord и попробуйте снова.';
+    return 'Camera is busy in another app. Close Zoom/Teams/Discord and try again.';
   }
 
   if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
-    return 'Текущие параметры камеры не поддерживаются. Пробуем безопасный режим.';
+    return 'Current camera constraints are not supported. Trying safe mode.';
   }
 
   if (name === 'SecurityError') {
-    return 'Камера недоступна в небезопасном контексте. Используйте HTTPS или localhost.';
+    return 'Camera is unavailable in an insecure context. Use HTTPS or localhost.';
   }
 
-  return `Ошибка камеры: ${error.message || name}`;
+  return `Camera error: ${error.message || name}`;
 }
 
 async function requestCameraStream() {
@@ -119,7 +119,7 @@ async function requestCameraStream() {
   for (let i = 0; i < constraintsList.length; i += 1) {
     try {
       if (i === 1) {
-        logEvent('Переключение в безопасный режим камеры...', 'ok');
+        logEvent('Switching to safe camera mode...', 'ok');
       }
 
       return await navigator.mediaDevices.getUserMedia(constraintsList[i]);
@@ -150,7 +150,7 @@ async function playSound(direction) {
 
   const isAudioReady = await ensureAudioContext();
   if (!isAudioReady) {
-    logEvent('Браузер заблокировал звук. Нажмите "Тест звука".', 'alert');
+    logEvent('Browser blocked audio. Click "Test Sound".', 'alert');
     return;
   }
 
@@ -338,10 +338,10 @@ function processFrame() {
       lastTriggerTs = now;
       movementLabel.textContent = directionLabels[result.direction];
       confidenceLabel.textContent = `${result.confidence}%`;
-      detectorStatus.textContent = result.direction === 'backward' ? 'Тревога' : 'Обнаружено';
+      detectorStatus.textContent = result.direction === 'backward' ? 'Alert' : 'Detected';
 
       const severity = result.direction === 'backward' ? 'alert' : 'ok';
-      logEvent(`Движение: ${directionLabels[result.direction]} (${result.confidence}%)`, severity);
+      logEvent(`Movement: ${directionLabels[result.direction]} (${result.confidence}%)`, severity);
       playSound(result.direction);
     }
   }
@@ -355,20 +355,20 @@ async function startCamera() {
   }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    cameraStatus.textContent = 'Камера не поддерживается';
-    detectorStatus.textContent = 'Ошибка';
-    logEvent('Браузер не поддерживает getUserMedia или страница открыта не через HTTPS/localhost.', 'alert');
+    cameraStatus.textContent = 'Camera not supported';
+    detectorStatus.textContent = 'Error';
+    logEvent('Browser does not support getUserMedia or page is not opened via HTTPS/localhost.', 'alert');
     return;
   }
 
   if (stream && stream.getTracks().some((track) => track.readyState === 'live')) {
-    logEvent('Камера уже активна.', 'ok');
+    logEvent('Camera is already active.', 'ok');
     return;
   }
 
   isStartingCamera = true;
   startBtn.disabled = true;
-  startBtn.textContent = 'Подключение...';
+  startBtn.textContent = 'Connecting...';
 
   try {
     stopCurrentStream();
@@ -383,19 +383,19 @@ async function startCamera() {
     processingCanvas.width = PROC_WIDTH;
     processingCanvas.height = PROC_HEIGHT;
 
-    cameraStatus.textContent = 'Камера активна';
-    detectorStatus.textContent = 'Сканирование';
-    logEvent('Камера запущена. Детектор активирован.', 'ok');
+    cameraStatus.textContent = 'Camera is active';
+    detectorStatus.textContent = 'Scanning';
+    logEvent('Camera started. Detector is active.', 'ok');
     processFrame();
   } catch (error) {
     stopCurrentStream();
-    cameraStatus.textContent = 'Ошибка доступа к камере';
-    detectorStatus.textContent = 'Ошибка';
+    cameraStatus.textContent = 'Camera access error';
+    detectorStatus.textContent = 'Error';
     logEvent(describeCameraError(error), 'alert');
   } finally {
     isStartingCamera = false;
     startBtn.disabled = false;
-    startBtn.textContent = 'Включить камеру';
+    startBtn.textContent = 'Turn On Camera';
   }
 }
 
@@ -404,9 +404,9 @@ startBtn.addEventListener('click', async () => {
   if (isAudioReady) {
     // Play a short confirmation beep inside a user gesture to unlock audio on strict browsers.
     await playSound('forward');
-    logEvent('Звук активирован.', 'ok');
+    logEvent('Sound is active.', 'ok');
   } else {
-    logEvent('Не удалось активировать звук в браузере.', 'alert');
+    logEvent('Failed to activate sound in the browser.', 'alert');
   }
 
   await startCamera();
@@ -414,11 +414,11 @@ startBtn.addEventListener('click', async () => {
 
 testSoundBtn.addEventListener('click', async () => {
   await playSound('right');
-  logEvent('Тест звука выполнен.', 'ok');
+  logEvent('Sound test played.', 'ok');
 });
 
 muteBtn.addEventListener('click', () => {
   isMuted = !isMuted;
-  muteBtn.textContent = isMuted ? 'Включить звук' : 'Выключить звук';
-  logEvent(isMuted ? 'Звук отключен пользователем.' : 'Звук включен пользователем.', 'ok');
+  muteBtn.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
+  logEvent(isMuted ? 'Sound muted by user.' : 'Sound unmuted by user.', 'ok');
 });

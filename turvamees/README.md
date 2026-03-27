@@ -1,50 +1,50 @@
 # Turvamees Motion Guard
 
-Веб-приложение на Node.js, которое получает видео с камеры, определяет направление движения объекта и воспроизводит отдельный звук для каждого типа движения.
+A Node.js web application that reads camera video, detects object movement direction, and plays a dedicated sound for each movement type.
 
-## Что реализовано
+## Implemented Features
 
-- Камера через `getUserMedia`
-- Детекция движения по разнице кадров
-- Определение направлений: влево, вправо, вверх, вниз, вперед, назад
-- Отдельный звук для каждого направления
-- Усиленная тревога при движении назад
-- Журнал событий и индикатор уверенности
-- Ссылка на главную страницу портфолио: `../index.html`
+- Camera access via `getUserMedia`
+- Motion detection using frame differencing
+- Direction detection: left, right, up, down, forward, backward
+- Dedicated sound for each direction
+- Stronger alarm signal for backward movement
+- Event log and confidence indicator
+- Link to portfolio home page: `../index.html`
 
-## Установка и запуск
+## Installation and Run
 
 ```bash
 npm install
 npm start
 ```
 
-После запуска откройте:
+After startup, open:
 
 - http://localhost:3000
 
-## Структура
+## Structure
 
-- `server.js` - Node.js + Express сервер
-- `public/index.html` - интерфейс
-- `public/styles.css` - дизайн
-- `public/app.js` - логика камеры, детекция движения, звуки
-- `.gitignore` - исключения для Git
+- `server.js` - Node.js + Express server
+- `public/index.html` - UI
+- `public/styles.css` - styling
+- `public/app.js` - camera logic, motion detection, sounds
+- `.gitignore` - Git ignore rules
 
-## 10 дополнительных классных функций (идеи)
+## 10 Extra Cool Features (Ideas)
 
-1. Пользовательские аудио-файлы: загрузка своего `.mp3/.wav` для каждого движения.
-2. Режим "тихая ночь": звук отключается по расписанию, а уведомления остаются.
-3. Фото-снимок при тревоге назад и автоматическое сохранение в галерею.
-4. Push-уведомления в браузер, когда обнаружено критичное движение.
-5. Визуальные темы интерфейса (Industrial, Neon, Minimal) с переключателем.
-6. Интеграция с Telegram-ботом для отправки тревожных событий.
-7. AI-фильтр ложных срабатываний (например, игнорировать движение штор).
-8. Карта зон чувствительности: пользователь выделяет область, где нужна тревога.
-9. Набор готовых звуковых пакетов (Siren, Sci-Fi, Retro Arcade).
-10. Экспорт журнала событий в PDF/CSV для отчетности.
+1. Custom audio files: upload your own `.mp3/.wav` for each direction.
+2. "Quiet Night" mode: auto-mute sound by schedule while keeping notifications.
+3. Snapshot on backward alert with automatic gallery save.
+4. Browser push notifications for critical movement events.
+5. Switchable visual themes (Industrial, Neon, Minimal).
+6. Telegram bot integration for real-time alert delivery.
+7. AI false-positive filter (for example, ignore curtain motion).
+8. Sensitivity zone map: highlight areas that should trigger alerts.
+9. Sound packs (Siren, Sci-Fi, Retro Arcade).
+10. Export event history to PDF/CSV for reporting.
 
-## Публикация на GitHub
+## Publish to GitHub
 
 ```bash
 git init
@@ -55,4 +55,4 @@ git remote add origin https://github.com/<YOUR_USERNAME>/turvamees-motion-guard.
 git push -u origin main
 ```
 
-Замените `<YOUR_USERNAME>` на ваш GitHub логин.
+Replace `<YOUR_USERNAME>` with your GitHub username.

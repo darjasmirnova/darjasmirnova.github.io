@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,15 +21,15 @@
         <p class="kicker">Node.js + Camera Vision Demo</p>
         <h1>Turvamees Motion Guard</h1>
         <p class="subtitle">
-          Приложение отслеживает движение объекта с камеры и ставит отдельный
-          звук на каждое направление: влево, вправо, вверх, вниз, вперед и назад.
+          The app tracks object movement from your camera and assigns a unique
+          sound to each direction: left, right, up, down, forward, and backward.
         </p>
 
         <div class="hero-actions">
-          <button id="startBtn" class="btn btn-primary">Включить камеру</button>
-          <button id="testSoundBtn" class="btn btn-secondary">Тест звука</button>
-          <button id="muteBtn" class="btn btn-ghost">Выключить звук</button>
-          <a class="btn btn-link" href="../index.html">На главную портфолио</a>
+          <button id="startBtn" class="btn btn-primary">Turn On Camera</button>
+          <button id="testSoundBtn" class="btn btn-secondary">Test Sound</button>
+          <button id="muteBtn" class="btn btn-ghost">Mute Sound</button>
+          <a class="btn btn-link" href="../index.html">Back to Portfolio Home</a>
         </div>
       </header>
 
@@ -37,25 +37,25 @@
         <div class="camera-wrap">
           <video id="video" autoplay playsinline muted></video>
           <canvas id="overlay"></canvas>
-          <p id="cameraStatus" class="camera-status">Камера отключена</p>
+          <p id="cameraStatus" class="camera-status">Camera is off</p>
         </div>
 
         <aside class="stats">
-          <h2>Состояние системы</h2>
+          <h2>System Status</h2>
           <div class="stat-row">
-            <span>Последнее движение</span>
+            <span>Last movement</span>
             <strong id="movementLabel">-</strong>
           </div>
           <div class="stat-row">
-            <span>Уверенность</span>
+            <span>Confidence</span>
             <strong id="confidenceLabel">0%</strong>
           </div>
           <div class="stat-row">
-            <span>Детектор</span>
-            <strong id="detectorStatus">Ожидание</strong>
+            <span>Detector</span>
+            <strong id="detectorStatus">Waiting</strong>
           </div>
 
-          <h3>Лента событий</h3>
+          <h3>Event feed</h3>
           <ul id="eventLog" class="event-log"></ul>
         </aside>
       </section>
