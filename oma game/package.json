@@ -1,0 +1,12 @@
+{
+  "name": "oma-game",
+  "version": "1.0.0",
+  "description": "Interactive 5-level Node.js adventure game with persistent progress",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

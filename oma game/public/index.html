@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skyline Relay - 5 Levels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="aurora aurora-one"></div>
+    <div class="aurora aurora-two"></div>
+
+    <main class="app-shell">
+      <section class="hud">
+        <h1>Skyline Relay</h1>
+        <p id="storyLine" class="story">Connecting pilot...</p>
+        <div class="stats">
+          <div><span>Player</span><strong id="nameLabel">-</strong></div>
+          <div><span>Level</span><strong id="levelLabel">1 / 5</strong></div>
+          <div><span>Score</span><strong id="scoreLabel">0</strong></div>
+          <div><span>Lives</span><strong id="livesLabel">3</strong></div>
+          <div><span>Remaining</span><strong id="targetLabel">0</strong></div>
+          <div><span>Time</span><strong id="timeLabel">0</strong></div>
+        </div>
+      </section>
+
+      <section class="arena-wrap">
+        <canvas id="gameCanvas" width="980" height="560" aria-label="Game arena"></canvas>
+        <div id="levelBanner" class="level-banner hidden"></div>
+      </section>
+    </main>
+
+    <section id="startOverlay" class="overlay">
+      <div class="card">
+        <h2>Mission Start</h2>
+        <p>Enter your pilot name. If a save exists, you can continue from the last checkpoint.</p>
+        <input id="nameInput" type="text" maxlength="32" placeholder="Your name" />
+        <div class="row">
+          <button id="newGameBtn">New Game</button>
+          <button id="continueBtn" class="secondary" disabled>Continue</button>
+        </div>
+        <p id="overlayHint" class="hint"></p>
+      </div>
+    </section>
+
+    <section id="resultOverlay" class="overlay hidden">
+      <div class="card">
+        <h2 id="resultTitle">Result</h2>
+        <p id="resultText"></p>
+        <button id="restartBtn">Play Again</button>
+      </div>
+    </section>
+
+    <script src="./game.js"></script>
+  </body>
+</html>
