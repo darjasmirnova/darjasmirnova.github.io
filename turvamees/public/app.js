@@ -20,6 +20,7 @@ let prevCentroid = null;
 let prevBoxArea = null;
 let isMuted = false;
 let lastTriggerTs = 0;
+let isStartingCamera = false;
 
 // Small processing resolution keeps frame analysis fast on most devices.
 const PROC_WIDTH = 160;
@@ -56,6 +57,78 @@ function logEvent(message, severity = 'ok') {
   while (eventLog.children.length > 14) {
     eventLog.removeChild(eventLog.lastChild);
   }
+}
+
+function stopCurrentStream() {
+  if (!stream) {
+    return;
+  }
+
+  for (const track of stream.getTracks()) {
+    track.stop();
+  }
+
+  stream = null;
+  video.srcObject = null;
+}
+
+function describeCameraError(error) {
+  const name = error && error.name ? error.name : 'UnknownError';
+
+  if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+    return 'Доступ к камере запрещен. Разрешите доступ к камере в браузере и перезагрузите страницу.';
+  }
+
+  if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+    return 'Камера не найдена. Подключите камеру и проверьте настройки устройства.';
+  }
+
+  if (name === 'NotReadableError' || name === 'TrackStartError') {
+    return 'Камера занята другим приложением. Закройте Zoom/Teams/Discord и попробуйте снова.';
+  }
+
+  if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
+    return 'Текущие параметры камеры не поддерживаются. Пробуем безопасный режим.';
+  }
+
+  if (name === 'SecurityError') {
+    return 'Камера недоступна в небезопасном контексте. Используйте HTTPS или localhost.';
+  }
+
+  return `Ошибка камеры: ${error.message || name}`;
+}
+
+async function requestCameraStream() {
+  const constraintsList = [
+    {
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user'
+      },
+      audio: false
+    },
+    {
+      video: true,
+      audio: false
+    }
+  ];
+
+  let lastError = null;
+
+  for (let i = 0; i < constraintsList.length; i += 1) {
+    try {
+      if (i === 1) {
+        logEvent('Переключение в безопасный режим камеры...', 'ok');
+      }
+
+      return await navigator.mediaDevices.getUserMedia(constraintsList[i]);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw lastError;
 }
 
 async function ensureAudioContext() {
@@ -277,19 +350,29 @@ function processFrame() {
 }
 
 async function startCamera() {
-  if (stream) {
+  if (isStartingCamera) {
     return;
   }
 
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    cameraStatus.textContent = 'Камера не поддерживается';
+    detectorStatus.textContent = 'Ошибка';
+    logEvent('Браузер не поддерживает getUserMedia или страница открыта не через HTTPS/localhost.', 'alert');
+    return;
+  }
+
+  if (stream && stream.getTracks().some((track) => track.readyState === 'live')) {
+    logEvent('Камера уже активна.', 'ok');
+    return;
+  }
+
+  isStartingCamera = true;
+  startBtn.disabled = true;
+  startBtn.textContent = 'Подключение...';
+
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        facingMode: 'user'
-      },
-      audio: false
-    });
+    stopCurrentStream();
+    stream = await requestCameraStream();
 
     video.srcObject = stream;
 
@@ -305,9 +388,14 @@ async function startCamera() {
     logEvent('Камера запущена. Детектор активирован.', 'ok');
     processFrame();
   } catch (error) {
+    stopCurrentStream();
     cameraStatus.textContent = 'Ошибка доступа к камере';
     detectorStatus.textContent = 'Ошибка';
-    logEvent(`Ошибка камеры: ${error.message}`, 'alert');
+    logEvent(describeCameraError(error), 'alert');
+  } finally {
+    isStartingCamera = false;
+    startBtn.disabled = false;
+    startBtn.textContent = 'Включить камеру';
   }
 }
 
